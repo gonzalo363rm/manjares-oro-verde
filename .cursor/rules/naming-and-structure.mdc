@@ -1,0 +1,51 @@
+---
+description: Carpetas, nombres de archivos y estructura del repo Manjares
+alwaysApply: true
+---
+
+# Naming y estructura
+
+## Idioma
+
+- **Rutas públicas y copy UI**: español (`/carrito`, `/pedido`, `/mis-pedidos`, “Pedir por WhatsApp”).
+- **Código** (módulos, tipos, funciones, props, variables): **inglés** (`createOrder`, `OrderStatus`, `cartHash`).
+- **Enums/DB Prisma**: inglés SCREAMING_SNAKE o PascalCase según Prisma (`PENDIENTE_CONFIRMACION`, `OrderItem`).
+- No mezclar español en identificadores (`crearOrden` ❌ → `createOrder` ✅).
+
+## Carpetas (`src/`)
+
+| Carpeta | Uso | Nombre |
+|---|---|---|
+| `app/` | App Router | segmentos en **kebab-case** español para URLs |
+| `actions/` | Server Actions por dominio | `actions/<domain>/` kebab-case |
+| `components/` | UI | subcarpeta por dominio (`orders/`, `admin/`, `cart/`) |
+| `lib/` | helpers puros / clientes | kebab-case files |
+| `store/` | Zustand | `store/<domain>/<name>-store.ts` |
+| `types/` | augmentations / shared types | kebab-case |
+
+No crear `utils/` genérico: preferir `lib/` con nombre específico (`order-money.ts`, no `helpers.ts`).
+
+## Archivos
+
+- Componentes React: **PascalCase** `WhatsAppOrderButton.tsx`.
+- Hooks: `use-` + camelCase file opcional; export `useCartStore`.
+- Server actions: **kebab-case** `create-order.ts`, un export principal alineado al archivo.
+- Schemas Zod del dominio: `schemas.ts` dentro del action folder.
+- Barrel `index.ts` solo si reexporta un dominio claro (`actions/orders/index.ts`).
+
+## Rutas App Router
+
+- Páginas: siempre `page.tsx` / `layout.tsx` / `loading.tsx`.
+- Dinámicas: `[code]`, `[slug]` en inglés.
+- Admin bajo `app/admin/...` (guard middleware).
+- API solo si hace falta (`app/api/auth/[...nextauth]`).
+
+## Env y LS keys
+
+- Env: `SCREAMING_SNAKE` (`ADMIN_EMAILS`, `NEXT_PUBLIC_WHATSAPP_NUMBER`).
+- LocalStorage: prefijo `manjares-` + kebab (`manjares-cart-v1`, `manjares-pending-order-code`).
+
+## Dependencias
+
+- **No usar `overrides` / `resolutions`** salvo que sea estrictamente necesario y esté documentado.
+- Preferir subir la dependencia directa (p. ej. `next`, `prisma`) a una versión parcheada.

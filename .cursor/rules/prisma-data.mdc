@@ -1,0 +1,28 @@
+---
+description: Convenciones Prisma y modelo de datos Manjares
+globs: prisma/**/*.{prisma,ts},src/lib/prisma.ts,src/actions/**/*.ts
+alwaysApply: false
+---
+
+# Prisma y datos
+
+## Schema
+
+- Models: **PascalCase** singular (`Order`, `OrderItem`, `Product`).
+- Fields: **camelCase** (`contactName`, `depositAmount`, `cartHash`).
+- Enums: **SCREAMING_SNAKE** (`EN_ESPERA_SENA`, `PENDIENTE_ENVIO`).
+- Money: `Decimal @db.Decimal(12, 2)`; convertir con helpers en `lib/order-money.ts`.
+- IDs: `uuid()` string; códigos de negocio aparte (`Order.code` único).
+- No persistir campos derivados (`remaining`); calcular en helper.
+
+## Queries / actions
+
+- Precios e ítems de pedido: **recalcular desde DB** en server (no confiar en el client).
+- Snapshots en `OrderItem` (`productName`, `unitPrice`) al crear la orden.
+- Admin updates: `revalidatePath` de lista, detalle admin y vista pública.
+- Cliente Prisma solo vía `src/lib/prisma.ts` (singleton).
+
+## Migraciones
+
+- No usar `db push` en flujos compartidos; preferir `migrate dev` / `migrate deploy`.
+- Seed en `prisma/seed.ts`; IDs demo estables solo para desarrollo.

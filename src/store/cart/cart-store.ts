@@ -1,0 +1,188 @@
+"use client";
+
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+
+import {
+  clearServerCart,
+  getCart,
+  mergeGuestCart,
+  setCartItem,
+} from "@/actions/cart";
+
+export type CartProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  price: number | null;
+  quantity: number;
+  image?: string;
+};
+
+type CartMode = "guest" | "user";
+
+type State = {
+  cart: CartProduct[];
+  mode: CartMode;
+  hydrated: boolean;
+  syncing: boolean;
+  getTotalItems: () => number;
+  setHydrated: (value: boolean) => void;
+  setFromServer: (items: CartProduct[]) => void;
+  enterUserMode: (items: CartProduct[]) => void;
+  enterGuestMode: () => void;
+  mergeOnLogin: () => Promise<void>;
+  reloadFromServer: () => Promise<void>;
+  addProduct: (product: CartProduct) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  removeProduct: (productId: string) => void;
+  clearCart: () => void;
+};
+
+const guestOnlyStorage = createJSONStorage(() => {
+  if (typeof window === "undefined") {
+    return {
+      getItem: () => null,
+      setItem: () => undefined,
+      removeItem: () => undefined,
+    };
+  }
+  return {
+    getItem: (name) => localStorage.getItem(name),
+    setItem: (name, value) => {
+      try {
+        const parsed = JSON.parse(value) as { state?: { mode?: string } };
+        if (parsed.state?.mode === "user") {
+          localStorage.removeItem(name);
+          return;
+        }
+      } catch {
+        // ignore
+      }
+      localStorage.setItem(name, value);
+    },
+    removeItem: (name) => localStorage.removeItem(name),
+  };
+});
+
+async function syncSetItem(productId: string, quantity: number) {
+  const result = await setCartItem({ productId, quantity });
+  if (!result.ok) {
+    const fresh = await getCart();
+    useCartStore.getState().setFromServer(fresh.items);
+    return;
+  }
+  useCartStore.getState().setFromServer(result.items);
+}
+
+export const useCartStore = create<State>()(
+  persist(
+    (set, get) => ({
+      cart: [],
+      mode: "guest",
+      hydrated: false,
+      syncing: false,
+
+      getTotalItems: () =>
+        get().cart.reduce((total, item) => total + item.quantity, 0),
+
+      setHydrated: (value) => set({ hydrated: value }),
+
+      setFromServer: (items) => set({ cart: items, syncing: false }),
+
+      enterUserMode: (items) => {
+        set({ mode: "user", cart: items, syncing: false });
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("manjares-cart-v1");
+        }
+      },
+
+      enterGuestMode: () => set({ mode: "guest", cart: [], syncing: false }),
+
+      mergeOnLogin: async () => {
+        const guestItems = get().cart.map((i) => ({
+          productId: i.id,
+          quantity: i.quantity,
+        }));
+        set({ syncing: true });
+        const result = await mergeGuestCart({ items: guestItems });
+        if (result.ok) {
+          get().enterUserMode(result.items);
+          return;
+        }
+        const fresh = await getCart();
+        if (fresh.ok) {
+          get().enterUserMode(fresh.items);
+          return;
+        }
+        // Evita skeleton eterno si el server falla: modo user vacío
+        get().enterUserMode([]);
+      },
+
+      reloadFromServer: async () => {
+        if (get().mode !== "user") return;
+        set({ syncing: true });
+        const fresh = await getCart();
+        if (fresh.ok) get().setFromServer(fresh.items);
+        else set({ syncing: false });
+      },
+
+      addProduct: (product) => {
+        const { cart, mode } = get();
+        const existing = cart.find((item) => item.id === product.id);
+        const nextQty = (existing?.quantity ?? 0) + product.quantity;
+        const nextCart = existing
+          ? cart.map((item) =>
+              item.id === product.id
+                ? { ...item, quantity: nextQty }
+                : item
+            )
+          : [...cart, product];
+        set({ cart: nextCart });
+        if (mode === "user") {
+          void syncSetItem(product.id, nextQty);
+        }
+      },
+
+      updateQuantity: (productId, quantity) => {
+        if (quantity <= 0) {
+          get().removeProduct(productId);
+          return;
+        }
+        set({
+          cart: get().cart.map((item) =>
+            item.id === productId ? { ...item, quantity } : item
+          ),
+        });
+        if (get().mode === "user") {
+          void syncSetItem(productId, quantity);
+        }
+      },
+
+      removeProduct: (productId) => {
+        set({ cart: get().cart.filter((item) => item.id !== productId) });
+        if (get().mode === "user") {
+          void syncSetItem(productId, 0);
+        }
+      },
+
+      clearCart: () => {
+        set({ cart: [] });
+        if (get().mode === "user") {
+          void clearServerCart();
+        }
+      },
+    }),
+    {
+      name: "manjares-cart-v1",
+      storage: guestOnlyStorage,
+      partialize: (state) =>
+        state.mode === "guest"
+          ? { cart: state.cart, mode: state.mode }
+          : { cart: [], mode: "guest" },
+      onRehydrateStorage: () => (state) => {
+        state?.setHydrated(true);
+      },
+    }
+  )
+);

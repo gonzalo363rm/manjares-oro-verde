@@ -1,0 +1,17 @@
+---
+description: Reglas de dominio Manjares (órdenes WA, carrito, admin)
+alwaysApply: true
+---
+
+# Dominio Manjares (resumen operativo)
+
+- Pedido WA → exige sesión; `createOrder` **antes** de abrir `wa.me`; código `MOV-XXXXXX` + link `/pedido/[code]`.
+- Sin sesión al pedir → borrador en `manjares-order-draft-v1` + login con `callbackUrl=/carrito?resume=1` (no se abre WA solo al volver).
+- Modal post-WA solo si se setea el flag de pedido; Sí → clear cart + historial; consulta fuera de catálogo **no** crea orden ni modal.
+- Carrito: invitado en LS (`manjares-cart-v1`); al login `mergeGuestCart` y modo user (DB); al logout vuelve a guest vacío.
+- `/pedido/[code]` pública, datos sensibles enmascarados, `noindex`.
+- Admin pedidos: seña, envío, descuento/override, ítems, total, estado; `remaining` calculado; aviso pendientes (badge + email SMTP).
+- Auth admin: Google + `ADMIN_EMAILS` server-side.
+- Fuera de alcance: Instagram; sync Meta/chatbot = fase 2; sin pagos online.
+
+Detalle ampliado: skill `manjares-domain`.

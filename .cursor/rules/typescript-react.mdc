@@ -1,0 +1,35 @@
+---
+description: Convenciones TypeScript y React/Next para Manjares
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# TypeScript + React / Next
+
+## TypeScript
+
+- `strict` on; evitar `any`. Preferir `unknown` + narrowing.
+- Tipos de dominio en el módulo cercano o `types/`; no duplicar shapes de Prisma si alcanza el client.
+- Server Actions: input validado con **Zod** (`safeParse`); devolver `{ ok: true, ... } | { ok: false, error: string }`.
+- Imports con alias `@/` (nunca `../../../` largos).
+- `"use server"` solo en archivos de actions; `"use client"` solo si hay estado/efectos/browser APIs.
+
+## Componentes
+
+- Function components; props tipadas inline o `type Props = { ... }`.
+- Server Components por defecto; client solo cuando hace falta.
+- Nombres de componentes = nombre de archivo PascalCase.
+- UI copy en español; clases Tailwind utilitarias (sin CSS modules salvo necesidad).
+- No agregar `useMemo`/`useCallback` por defecto.
+
+## Next.js
+
+- Data fetching / mutaciones: Server Actions o `auth()` en server; no Route Handlers de más.
+- Rutas con DB: `export const dynamic = "force-dynamic"`.
+- Admin: chequear whitelist **en servidor** siempre (no confiar en ocultar links).
+- No importar `prisma` ni código Node en módulos Edge (`auth.config.ts` / middleware).
+
+## Zustand
+
+- Store en `src/store/<domain>/`; persist con nombre versionado.
+- Selectores granulares: `useCartStore((s) => s.cart)` (no el store entero).
