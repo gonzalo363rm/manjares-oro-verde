@@ -6,6 +6,7 @@ import { CartSeedProvider } from "@/components/cart/cart-seed-context";
 import { CartSync } from "@/components/cart/CartSync";
 import { PostWhatsAppModal } from "@/components/orders/PostWhatsAppModal";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Footer } from "@/components/ui/Footer";
 import { TopMenu } from "@/components/ui/TopMenu";
@@ -96,6 +97,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <JsonLd />
+        <GoogleAnalytics />
         <SessionProvider>
           <CartSeedProvider initialServerCart={initialServerCart}>
             <main className="flex min-h-screen flex-col">
