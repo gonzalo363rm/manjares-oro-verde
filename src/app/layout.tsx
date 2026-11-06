@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     absolute: "Manjares de Oro Verde — Mesas dulces",
   },
   description:
-    "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden con un código único.",
+    "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden.",
   applicationName: "Manjares de Oro Verde",
   keywords: [
     "mesas dulces",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     siteName: "Manjares de Oro Verde",
     title: "Manjares de Oro Verde — Mesas dulces",
     description:
-      "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden con un código único.",
+      "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden.",
     images: [
       {
         url: "/branding/logo.jpg",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Manjares de Oro Verde — Mesas dulces",
     description:
-      "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden con un código único.",
+      "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden.",
     images: ["/branding/logo.jpg"],
   },
 };
