@@ -24,11 +24,33 @@ function resolveDatabaseUrl(): string {
       console.warn(
         "[prisma] DATABASE_URL pointed to localhost; using cloud URL instead"
       );
-      return cloud;
+      return withConnectTimeout(cloud);
     }
   }
 
-  return url;
+  return withConnectTimeout(url);
+}
+
+/** Evita cuelgues largos y da margen a cold start de Prisma Postgres. */
+function withConnectTimeout(url: string): string {
+  if (/[?&]connect_timeout=/i.test(url)) return url;
+  return url.includes("?")
+    ? `${url}&connect_timeout=10`
+    : `${url}?connect_timeout=10`;
+}
+
+function isRetryableDbError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  const name = error instanceof Error ? error.name : "";
+  return (
+    name === "PrismaClientInitializationError" ||
+    message.includes("Can't reach database server") ||
+    message.includes("P1001") ||
+    message.includes("P1017") ||
+    message.includes("Connection reset") ||
+    message.includes("ECONNRESET") ||
+    message.includes("ETIMEDOUT")
+  );
 }
 
 const globalForPrisma = globalThis as unknown as {
@@ -44,10 +66,35 @@ function createPrismaClient(url: string) {
     console.info("[prisma] connecting (host parse failed)");
   }
 
-  return new PrismaClient({
+  const base = new PrismaClient({
     datasources: { db: { url } },
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
+
+  // Reintentos cortos ante caídas intermitentes del pooler / cold start.
+  return base.$extends({
+    query: {
+      async $allOperations({ args, query }) {
+        const attempts = 3;
+        let lastError: unknown;
+        for (let i = 0; i < attempts; i++) {
+          try {
+            return await query(args);
+          } catch (error) {
+            lastError = error;
+            if (!isRetryableDbError(error) || i === attempts - 1) throw error;
+            await new Promise((r) => setTimeout(r, 350 * (i + 1)));
+            try {
+              await base.$connect();
+            } catch {
+              // el próximo query reintenta igual
+            }
+          }
+        }
+        throw lastError;
+      },
+    },
+  }) as unknown as PrismaClient;
 }
 
 const databaseUrl = resolveDatabaseUrl();

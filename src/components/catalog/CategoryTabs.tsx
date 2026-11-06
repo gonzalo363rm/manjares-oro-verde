@@ -1,8 +1,15 @@
+"use client";
+
 import Link from "next/link";
 
 type Tab = { href: string; label: string; active: boolean };
 
-export function CategoryTabs({ tabs }: { tabs: Tab[] }) {
+type Props = {
+  tabs: Tab[];
+  onNavigate?: (href: string) => void;
+};
+
+export function CategoryTabs({ tabs, onNavigate }: Props) {
   return (
     <nav
       aria-label="Categorías"
@@ -14,6 +21,7 @@ export function CategoryTabs({ tabs }: { tabs: Tab[] }) {
           href={tab.href}
           className="site-nav-link site-nav-link--desktop shrink-0 px-3 py-2"
           aria-current={tab.active ? "page" : undefined}
+          onClick={() => onNavigate?.(tab.href)}
         >
           {tab.label}
         </Link>
