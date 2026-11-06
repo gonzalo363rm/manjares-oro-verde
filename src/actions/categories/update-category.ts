@@ -64,7 +64,6 @@ export async function updateCategory(
       name: data.name,
       slug,
       description: data.description ?? "",
-      sortOrder: data.sortOrder ?? 0,
       active: data.active ?? true,
       imagePublicId: nextPublicId,
       imageVersion: nextVersion,

@@ -42,7 +42,6 @@ export default async function EditarCategoriaPage({ params }: Props) {
               name: category.name,
               slug: category.slug,
               description: category.description,
-              sortOrder: category.sortOrder,
               active: category.active,
               imagePublicId: category.imagePublicId,
               imageVersion: category.imageVersion,

@@ -6,6 +6,11 @@ export {
   setProductActive,
   setProductActiveFormAction,
 } from "./set-product-active";
+export {
+  deleteProduct,
+  deleteProductFormAction,
+} from "./delete-product";
+export { reorderProducts } from "./reorder-products";
 export { signImageUpload } from "./sign-image-upload";
 export type {
   CreateProductInput,

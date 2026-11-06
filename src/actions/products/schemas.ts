@@ -15,7 +15,6 @@ export const createProductSchema = z.object({
   price: z.number().min(0).optional().nullable(),
   unitNote: z.string().trim().max(40).optional().nullable(),
   categoryId: z.string().uuid(),
-  sortOrder: z.number().int().min(0).max(9999).optional().default(0),
   active: z.boolean().optional().default(true),
   retailerId: z.string().trim().max(80).optional().nullable(),
   images: z.array(productImageInputSchema).max(10).optional().default([]),

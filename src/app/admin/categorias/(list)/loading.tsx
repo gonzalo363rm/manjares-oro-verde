@@ -10,7 +10,7 @@ export default function AdminCategoriasListLoading() {
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
           <div className="border-b border-border bg-muted/50 px-4 py-3">
             <div className="flex gap-8">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className="h-3 w-16" />
               ))}
             </div>
@@ -20,8 +20,8 @@ export default function AdminCategoriasListLoading() {
               key={i}
               className="flex items-center gap-6 border-b border-border px-4 py-4 last:border-0"
             >
+              <Skeleton className="size-5 shrink-0" />
               <Skeleton className="h-4 w-32 shrink-0" />
-              <Skeleton className="h-4 w-10 shrink-0" />
               <Skeleton className="h-4 w-10 shrink-0" />
               <Skeleton className="h-5 w-16 shrink-0 rounded-full" />
               <Skeleton className="ml-auto h-8 w-16 shrink-0" />

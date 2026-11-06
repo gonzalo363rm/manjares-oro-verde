@@ -29,6 +29,7 @@ export async function listAdminProducts(filters?: {
         orderBy: { sortOrder: "asc" },
         take: 1,
       },
+      _count: { select: { orderItems: true } },
     },
   });
 }

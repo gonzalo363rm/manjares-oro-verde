@@ -42,12 +42,17 @@ export async function createCategory(
     return Boolean(found);
   });
 
+  const maxOrder = await prisma.category.aggregate({
+    _max: { sortOrder: true },
+  });
+  const sortOrder = (maxOrder._max.sortOrder ?? -1) + 1;
+
   const category = await prisma.category.create({
     data: {
       name: data.name,
       slug,
       description: data.description ?? "",
-      sortOrder: data.sortOrder ?? 0,
+      sortOrder,
       active: data.active ?? true,
       imagePublicId: data.image?.publicId ?? null,
       imageVersion: data.image?.version ?? null,

@@ -79,9 +79,10 @@ export function cloudinaryAssetName(opts: {
   kind: "category" | "product";
   index?: number;
 }): string {
-  const stamp = Date.now().toString(36);
+  const stamp = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
   if (opts.kind === "category") {
-    return `cover-${stamp}`;
+    const role = (opts.index ?? 0) === 0 ? "cover" : "hover";
+    return `${role}-${stamp}`;
   }
   const n = String((opts.index ?? 0) + 1).padStart(2, "0");
   return `image-${n}-${stamp}`;

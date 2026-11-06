@@ -72,7 +72,6 @@ export async function updateProduct(
           data.price == null ? null : new Decimal(data.price.toFixed(2)),
         unitNote: data.unitNote || null,
         categoryId: data.categoryId,
-        sortOrder: data.sortOrder ?? 0,
         active: data.active ?? true,
         retailerId: data.retailerId?.trim() || existing.retailerId,
         metaSyncStatus: "PENDING",

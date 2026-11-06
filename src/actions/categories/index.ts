@@ -5,4 +5,5 @@ export {
   deleteCategory,
   deleteCategoryFormAction,
 } from "./delete-category";
+export { reorderCategories } from "./reorder-categories";
 export type { CreateCategoryInput, UpdateCategoryInput } from "./schemas";

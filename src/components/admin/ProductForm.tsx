@@ -38,7 +38,6 @@ type Props = {
     price: number | null;
     unitNote: string | null;
     categoryId: string;
-    sortOrder: number;
     active: boolean;
     retailerId: string | null;
     images: UploadedImage[];
@@ -59,9 +58,6 @@ export function ProductForm({ categories, initial }: Props) {
   const [categoryId, setCategoryId] = useState(
     initial?.categoryId ?? categories[0]?.id ?? ""
   );
-  const [sortOrder, setSortOrder] = useState(
-    String(initial?.sortOrder ?? 0)
-  );
   const [active, setActive] = useState(initial?.active ?? true);
   const [retailerId, setRetailerId] = useState(initial?.retailerId ?? "");
   const [images, setImages] = useState<UploadedImage[]>(initial?.images ?? []);
@@ -80,7 +76,6 @@ export function ProductForm({ categories, initial }: Props) {
       price: price === "" ? null : Number(price),
       unitNote: unitNote || null,
       categoryId,
-      sortOrder: Number(sortOrder) || 0,
       active,
       retailerId: retailerId || null,
       images: images as ProductImageInput[],
@@ -153,16 +148,6 @@ export function ProductForm({ categories, initial }: Props) {
             placeholder="x12, por docena…"
             value={unitNote}
             onChange={(e) => setUnitNote(e.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="sortOrder">Orden</Label>
-          <Input
-            id="sortOrder"
-            type="number"
-            min={0}
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
           />
         </div>
         <div className="space-y-2">

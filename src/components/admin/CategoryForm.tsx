@@ -23,7 +23,6 @@ type Props = {
     name: string;
     slug: string;
     description: string;
-    sortOrder: number;
     active: boolean;
     imagePublicId: string | null;
     imageVersion: number | null;
@@ -62,7 +61,6 @@ export function CategoryForm({ initial }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState(initial?.name ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [sortOrder, setSortOrder] = useState(String(initial?.sortOrder ?? 0));
   const [active, setActive] = useState(initial?.active ?? true);
   const [images, setImages] = useState<UploadedImage[]>(() =>
     imagesFromInitial(initial)
@@ -75,7 +73,6 @@ export function CategoryForm({ initial }: Props) {
   function resetCreateForm() {
     setName("");
     setDescription("");
-    setSortOrder("0");
     setActive(true);
     setImages([]);
     setError(null);
@@ -95,7 +92,6 @@ export function CategoryForm({ initial }: Props) {
       const payload = {
         name,
         description,
-        sortOrder: Number(sortOrder) || 0,
         active,
         image: cover,
         hoverImage: hover,
@@ -135,16 +131,6 @@ export function CategoryForm({ initial }: Props) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="cat-order">Orden</Label>
-        <Input
-          id="cat-order"
-          type="number"
-          min={0}
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
         />
       </div>
       <div className="flex items-center gap-3">

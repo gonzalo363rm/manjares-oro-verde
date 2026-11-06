@@ -53,7 +53,6 @@ export default async function EditarProductoPage({ params }: Props) {
               price: toNumber(product.price),
               unitNote: product.unitNote,
               categoryId: product.categoryId,
-              sortOrder: product.sortOrder,
               active: product.active,
               retailerId: product.retailerId,
               images: product.images.map((img) => ({

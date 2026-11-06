@@ -1,23 +1,11 @@
 import Link from "next/link";
 
 import { listCategories } from "@/actions/categories";
-import {
-  listAdminProducts,
-  setProductActiveFormAction,
-} from "@/actions/products";
+import { listAdminProducts } from "@/actions/products";
 import { AdminProductFilters } from "@/components/admin/AdminProductFilters";
-import { Badge } from "@/components/ui/badge";
+import { AdminProductsSortableList } from "@/components/admin/AdminProductsSortableList";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { TextLink } from "@/components/ui/TextLink";
-import { formatMoneyARS } from "@/lib/order-money";
 
 export const dynamic = "force-dynamic";
 
@@ -69,57 +57,23 @@ export default async function AdminProductosPage({ searchParams }: Props) {
           No hay productos con ese filtro.
         </p>
       ) : (
-        <div className="rounded-2xl border border-border bg-card">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Categoría</TableHead>
-                <TableHead>Precio</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Sync</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.name}</TableCell>
-                  <TableCell>{p.category.name}</TableCell>
-                  <TableCell>
-                    {formatMoneyARS(p.price ? Number(p.price) : null)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={p.active ? "default" : "outline"}>
-                      {p.active ? "Activo" : "Inactivo"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{p.metaSyncStatus}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button asChild variant="ghost" size="sm">
-                        <Link href={`/admin/productos/${p.id}`}>Editar</Link>
-                      </Button>
-                      <form
-                        action={setProductActiveFormAction.bind(
-                          null,
-                          p.id,
-                          !p.active
-                        )}
-                      >
-                        <Button type="submit" variant="ghost" size="sm">
-                          {p.active ? "Desactivar" : "Activar"}
-                        </Button>
-                      </form>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <AdminProductsSortableList
+          products={products.map((p) => ({
+            id: p.id,
+            name: p.name,
+            categoryName: p.category.name,
+            price: p.price ? Number(p.price) : null,
+            active: p.active,
+            metaSyncStatus: p.metaSyncStatus,
+            canDelete: p._count.orderItems === 0,
+            thumb: p.images[0]
+              ? {
+                  publicId: p.images[0].publicId,
+                  version: p.images[0].version,
+                }
+              : null,
+          }))}
+        />
       )}
     </main>
   );

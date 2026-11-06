@@ -53,6 +53,12 @@ export async function createProduct(
       return Boolean(found);
     }));
 
+  const maxOrder = await prisma.product.aggregate({
+    where: { categoryId: data.categoryId },
+    _max: { sortOrder: true },
+  });
+  const sortOrder = (maxOrder._max.sortOrder ?? -1) + 1;
+
   const product = await prisma.product.create({
     data: {
       name: data.name,
@@ -62,7 +68,7 @@ export async function createProduct(
         data.price == null ? null : new Decimal(data.price.toFixed(2)),
       unitNote: data.unitNote || null,
       categoryId: data.categoryId,
-      sortOrder: data.sortOrder ?? 0,
+      sortOrder,
       active: data.active ?? true,
       retailerId,
       metaSyncStatus: "PENDING",
