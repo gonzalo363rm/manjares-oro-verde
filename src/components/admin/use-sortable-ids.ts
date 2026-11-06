@@ -6,7 +6,13 @@ type ReorderFn = (
   raw: { orderedIds: string[] }
 ) => Promise<{ ok: true } | { ok: false; error: string }>;
 
-export function useSortableIds<T extends { id: string }>(
+function syncKey<T extends { id: string; active?: boolean }>(items: T[]) {
+  return items
+    .map((i) => `${i.id}:${i.active === undefined ? "" : i.active ? "1" : "0"}`)
+    .join(",");
+}
+
+export function useSortableIds<T extends { id: string; active?: boolean }>(
   initialItems: T[],
   reorder: ReorderFn
 ) {
@@ -15,13 +21,13 @@ export function useSortableIds<T extends { id: string }>(
   const [pending, startTransition] = useTransition();
   const dragFrom = useRef<number | null>(null);
   const [dragOver, setDragOver] = useState<number | null>(null);
-  const idsKey = initialItems.map((i) => i.id).join(",");
+  const key = syncKey(initialItems);
   const initialRef = useRef(initialItems);
   initialRef.current = initialItems;
 
   useEffect(() => {
     setItems(initialRef.current);
-  }, [idsKey]);
+  }, [key]);
 
   function onDragStart(index: number) {
     dragFrom.current = index;
@@ -62,8 +68,11 @@ export function useSortableIds<T extends { id: string }>(
 
   return {
     items,
+    setItems,
     error,
+    setError,
     pending,
+    startTransition,
     dragOver,
     onDragStart,
     onDragOver,

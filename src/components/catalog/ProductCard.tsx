@@ -90,10 +90,10 @@ export function ProductCard({
 
   return (
     <>
-      <article className="card-lift group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <article className="card-lift group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
         <button
           type="button"
-          className={`relative aspect-square w-full overflow-hidden bg-stone-100 text-left ${
+          className={`relative aspect-square w-full shrink-0 overflow-hidden bg-stone-100 text-left ${
             hasImages ? "cursor-pointer" : "cursor-default"
           }`}
           onClick={openPreview}
@@ -129,8 +129,8 @@ export function ProductCard({
           )}
         </button>
 
-        <div className="space-y-2 p-4">
-          <div>
+        <div className="flex flex-1 flex-col gap-2 p-4">
+          <div className="flex-1">
             <h3 className="font-semibold text-stone-900">{name}</h3>
             {unitNote ? (
               <p className="text-xs text-stone-500">{unitNote}</p>
@@ -141,7 +141,7 @@ export function ProductCard({
               </p>
             ) : null}
           </div>
-          <div className="flex items-center justify-between gap-2">
+          <div className="mt-auto flex items-center justify-between gap-2">
             <p className="font-medium text-emerald-900">
               {formatMoneyARS(price)}
             </p>

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 
+import { getCart } from "@/actions/cart";
+import { auth } from "@/auth";
+import { CartSeedProvider } from "@/components/cart/cart-seed-context";
 import { CartSync } from "@/components/cart/CartSync";
 import { PostWhatsAppModal } from "@/components/orders/PostWhatsAppModal";
 import { SessionProvider } from "@/components/providers/SessionProvider";
@@ -63,11 +66,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+  let initialServerCart: Awaited<ReturnType<typeof getCart>>["items"] | null =
+    null;
+
+  if (session?.user?.id) {
+    const cart = await getCart();
+    if (cart.ok) initialServerCart = cart.items;
+  }
+
   return (
     <html lang="es">
       <body
@@ -75,13 +87,15 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <SessionProvider>
-          <main className="flex min-h-screen flex-col">
-            <TopMenu />
-            <div className="flex-1">{children}</div>
-            <Footer />
-          </main>
-          <PostWhatsAppModal />
-          <CartSync />
+          <CartSeedProvider initialServerCart={initialServerCart}>
+            <main className="flex min-h-screen flex-col">
+              <TopMenu />
+              <div className="flex-1">{children}</div>
+              <Footer />
+            </main>
+            <PostWhatsAppModal />
+            <CartSync serverSeeded={initialServerCart != null} />
+          </CartSeedProvider>
         </SessionProvider>
       </body>
     </html>

@@ -65,14 +65,44 @@ const guestOnlyStorage = createJSONStorage(() => {
   };
 });
 
+/** Per-product generation so older setCartItem responses never overwrite newer qty. */
+const productSyncGen = new Map<string, number>();
+let pendingMutations = 0;
+
 async function syncSetItem(productId: string, quantity: number) {
-  const result = await setCartItem({ productId, quantity });
-  if (!result.ok) {
-    const fresh = await getCart();
-    useCartStore.getState().setFromServer(fresh.items);
-    return;
+  const gen = (productSyncGen.get(productId) ?? 0) + 1;
+  productSyncGen.set(productId, gen);
+  pendingMutations += 1;
+
+  try {
+    const result = await setCartItem({ productId, quantity });
+    if (productSyncGen.get(productId) !== gen) return;
+
+    if (!result.ok) {
+      const fresh = await getCart();
+      if (productSyncGen.get(productId) !== gen) return;
+      if (fresh.ok) {
+        useCartStore.getState().setFromServer(fresh.items);
+      }
+    }
+    // On success keep optimistic local cart — applying result.items races with +/−.
+  } finally {
+    pendingMutations = Math.max(0, pendingMutations - 1);
   }
-  useCartStore.getState().setFromServer(result.items);
+}
+
+function mergeCartPreferLocal(
+  server: CartProduct[],
+  local: CartProduct[]
+): CartProduct[] {
+  const byId = new Map(server.map((item) => [item.id, item]));
+  for (const item of local) {
+    const existing = byId.get(item.id);
+    if (!existing || item.quantity !== existing.quantity) {
+      byId.set(item.id, item);
+    }
+  }
+  return Array.from(byId.values());
 }
 
 export const useCartStore = create<State>()(
@@ -100,29 +130,49 @@ export const useCartStore = create<State>()(
       enterGuestMode: () => set({ mode: "guest", cart: [], syncing: false }),
 
       mergeOnLogin: async () => {
+        if (get().syncing) return;
         const guestItems = get().cart.map((i) => ({
           productId: i.id,
           quantity: i.quantity,
         }));
-        set({ syncing: true });
+        // Enter user mode early so concurrent adds sync to the server.
+        set({ syncing: true, mode: "user" });
         const result = await mergeGuestCart({ items: guestItems });
+        const localDuring = get().cart;
+
         if (result.ok) {
-          get().enterUserMode(result.items);
+          const merged = mergeCartPreferLocal(result.items, localDuring);
+          set({ cart: merged, syncing: false, mode: "user" });
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("manjares-cart-v1");
+          }
+          for (const item of localDuring) {
+            const serverItem = result.items.find((i) => i.id === item.id);
+            if (!serverItem || serverItem.quantity !== item.quantity) {
+              void syncSetItem(item.id, item.quantity);
+            }
+          }
           return;
         }
+
         const fresh = await getCart();
         if (fresh.ok) {
-          get().enterUserMode(fresh.items);
+          const merged = mergeCartPreferLocal(fresh.items, localDuring);
+          set({ cart: merged, syncing: false, mode: "user" });
           return;
         }
-        // Evita skeleton eterno si el server falla: modo user vacío
-        get().enterUserMode([]);
+        set({ cart: localDuring, syncing: false, mode: "user" });
       },
 
       reloadFromServer: async () => {
         if (get().mode !== "user") return;
+        if (pendingMutations > 0 || get().syncing) return;
         set({ syncing: true });
         const fresh = await getCart();
+        if (pendingMutations > 0) {
+          set({ syncing: false });
+          return;
+        }
         if (fresh.ok) get().setFromServer(fresh.items);
         else set({ syncing: false });
       },
@@ -137,7 +187,7 @@ export const useCartStore = create<State>()(
                 ? { ...item, quantity: nextQty }
                 : item
             )
-          : [...cart, product];
+          : [...cart, { ...product, quantity: nextQty }];
         set({ cart: nextCart });
         if (mode === "user") {
           void syncSetItem(product.id, nextQty);
@@ -167,8 +217,15 @@ export const useCartStore = create<State>()(
       },
 
       clearCart: () => {
+        const prev = get().cart;
         set({ cart: [] });
         if (get().mode === "user") {
+          for (const item of prev) {
+            productSyncGen.set(
+              item.id,
+              (productSyncGen.get(item.id) ?? 0) + 1
+            );
+          }
           void clearServerCart();
         }
       },
@@ -176,13 +233,12 @@ export const useCartStore = create<State>()(
     {
       name: "manjares-cart-v1",
       storage: guestOnlyStorage,
+      // CartSeedProvider hydrates sync from server/LS before paint.
+      skipHydration: true,
       partialize: (state) =>
         state.mode === "guest"
           ? { cart: state.cart, mode: state.mode }
-          : { cart: [], mode: "guest" },
-      onRehydrateStorage: () => (state) => {
-        state?.setHydrated(true);
-      },
+          : { mode: "user" as const },
     }
   )
 );

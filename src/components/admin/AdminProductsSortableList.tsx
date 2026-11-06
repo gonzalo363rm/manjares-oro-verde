@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { IoMenu } from "react-icons/io5";
 
 import {
   deleteProductFormAction,
   reorderProducts,
-  setProductActiveFormAction,
+  setProductActive,
 } from "@/actions/products";
 import { useSortableIds } from "@/components/admin/use-sortable-ids";
 import { Badge } from "@/components/ui/badge";
@@ -38,16 +39,41 @@ type Props = {
 };
 
 export function AdminProductsSortableList({ products }: Props) {
+  const router = useRouter();
   const {
     items,
+    setItems,
     error,
+    setError,
     pending,
+    startTransition,
     dragOver,
     onDragStart,
     onDragOver,
     onDragEnd,
     onDrop,
   } = useSortableIds(products, reorderProducts);
+
+  function toggleActive(product: AdminProductRow) {
+    const nextActive = !product.active;
+    const snapshot = items;
+    setItems(
+      items.map((item) =>
+        item.id === product.id ? { ...item, active: nextActive } : item
+      )
+    );
+    setError(null);
+
+    startTransition(async () => {
+      const result = await setProductActive(product.id, nextActive);
+      if (!result.ok) {
+        setItems(snapshot);
+        setError(result.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
 
   return (
     <div className="space-y-2">
@@ -133,17 +159,14 @@ export function AdminProductsSortableList({ products }: Props) {
                     <Button asChild variant="ghost" size="sm">
                       <Link href={`/admin/productos/${p.id}`}>Editar</Link>
                     </Button>
-                    <form
-                      action={setProductActiveFormAction.bind(
-                        null,
-                        p.id,
-                        !p.active
-                      )}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleActive(p)}
                     >
-                      <Button type="submit" variant="ghost" size="sm">
-                        {p.active ? "Desactivar" : "Activar"}
-                      </Button>
-                    </form>
+                      {p.active ? "Desactivar" : "Activar"}
+                    </Button>
                     {p.canDelete ? (
                       <form action={deleteProductFormAction.bind(null, p.id)}>
                         <Button

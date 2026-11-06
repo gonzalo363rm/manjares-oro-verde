@@ -5,26 +5,42 @@ import { useEffect, useRef } from "react";
 
 import { useCartStore } from "@/store/cart/cart-store";
 
-export function CartSync() {
+type Props = {
+  /** True when layout already seeded the cart from the server. */
+  serverSeeded?: boolean;
+};
+
+export function CartSync({ serverSeeded = false }: Props) {
   const { status } = useSession();
   const mode = useCartStore((s) => s.mode);
   const hydrated = useCartStore((s) => s.hydrated);
   const mergeOnLogin = useCartStore((s) => s.mergeOnLogin);
   const enterGuestMode = useCartStore((s) => s.enterGuestMode);
   const reloadFromServer = useCartStore((s) => s.reloadFromServer);
-  const prevStatus = useRef(status);
+  const didInitialUserLoad = useRef(serverSeeded);
 
   useEffect(() => {
     if (!hydrated) return;
 
     if (status === "authenticated" && mode !== "user") {
       void mergeOnLogin();
+    } else if (status === "authenticated" && mode === "user") {
+      if (!didInitialUserLoad.current) {
+        didInitialUserLoad.current = true;
+        void reloadFromServer();
+      }
     } else if (status === "unauthenticated" && mode === "user") {
+      didInitialUserLoad.current = false;
       enterGuestMode();
     }
-
-    prevStatus.current = status;
-  }, [status, mode, hydrated, mergeOnLogin, enterGuestMode]);
+  }, [
+    status,
+    mode,
+    hydrated,
+    mergeOnLogin,
+    enterGuestMode,
+    reloadFromServer,
+  ]);
 
   useEffect(() => {
     function onVisible() {

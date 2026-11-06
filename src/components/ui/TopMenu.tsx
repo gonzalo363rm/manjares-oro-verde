@@ -16,6 +16,7 @@ import {
 } from "react-icons/io5";
 
 import { countPendingOrders } from "@/actions/orders";
+import { useSeededCartTotal } from "@/components/cart/cart-seed-context";
 import { ScrollToSectionLink } from "@/components/ui/ScrollToSectionLink";
 import { Skeleton } from "@/components/ui/skeleton";
 import { titleFont } from "@/config/fonts";
@@ -216,10 +217,12 @@ function UserMenu({
 
 export function TopMenu() {
   const { data: session, status } = useSession();
-  const totalItems = useCartStore((s) => s.getTotalItems());
+  const storeTotalItems = useCartStore((s) => s.getTotalItems());
   const cartHydrated = useCartStore((s) => s.hydrated);
   const cartSyncing = useCartStore((s) => s.syncing);
   const cartMode = useCartStore((s) => s.mode);
+  const seededTotalItems = useSeededCartTotal();
+  const totalItems = cartHydrated ? storeTotalItems : seededTotalItems;
   const [loaded, setLoaded] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -236,9 +239,9 @@ export function TopMenu() {
     "Cuenta";
   const cartBadgeReady =
     loaded &&
-    cartHydrated &&
-    !cartSyncing &&
-    !(status === "authenticated" && cartMode !== "user") &&
+    (cartHydrated || seededTotalItems > 0) &&
+    !(cartHydrated && cartSyncing) &&
+    !(status === "authenticated" && cartHydrated && cartMode !== "user") &&
     !(status === "loading");
 
   useEffect(() => {
