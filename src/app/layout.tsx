@@ -47,9 +47,9 @@ export const metadata: Metadata = {
       "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden con un código único.",
     images: [
       {
-        url: "/branding/og.png",
+        url: "/branding/logo.jpg",
         width: 1200,
-        height: 630,
+        height: 1200,
         alt: "Manjares de Oro Verde",
       },
     ],
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     title: "Manjares de Oro Verde — Mesas dulces",
     description:
       "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden con un código único.",
-    images: ["/branding/og.png"],
+    images: ["/branding/logo.jpg"],
   },
 };
 

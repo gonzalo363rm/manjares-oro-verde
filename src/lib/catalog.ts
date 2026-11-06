@@ -1,8 +1,8 @@
-import { unstable_cache } from "next/cache";
+import { cache } from "react";
 
 import { prisma } from "@/lib/prisma";
 
-async function fetchActiveCategories() {
+export const getActiveCategories = cache(async () => {
   return prisma.category.findMany({
     where: {
       active: true,
@@ -20,9 +20,9 @@ async function fetchActiveCategories() {
       },
     },
   });
-}
+});
 
-async function fetchCatalogProducts(categorySlug?: string) {
+export const getCatalogProducts = cache(async (categorySlug?: string) => {
   return prisma.product.findMany({
     where: {
       active: true,
@@ -36,24 +36,10 @@ async function fetchCatalogProducts(categorySlug?: string) {
       images: { orderBy: { sortOrder: "asc" }, take: 6 },
     },
   });
-}
+});
 
-export const getActiveCategories = unstable_cache(
-  fetchActiveCategories,
-  ["active-categories"],
-  { tags: ["catalog"], revalidate: 3600 }
-);
-
-export function getCatalogProducts(categorySlug?: string) {
-  return unstable_cache(
-    () => fetchCatalogProducts(categorySlug),
-    ["catalog-products", categorySlug ?? "all"],
-    { tags: ["catalog"], revalidate: 3600 }
-  )();
-}
-
-export async function getCategoryBySlug(slug: string) {
+export const getCategoryBySlug = cache(async (slug: string) => {
   return prisma.category.findFirst({
     where: { slug, active: true },
   });
-}
+});
