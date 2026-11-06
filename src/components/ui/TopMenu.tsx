@@ -408,6 +408,7 @@ export function TopMenu() {
                 className="site-nav-link px-2 py-2"
                 aria-label={cartLabel}
               >
+                <span className="sr-only">{cartLabel}</span>
                 <CartIcon
                   sizeClass="site-nav-cart-icon"
                   totalItems={totalItems}
@@ -446,6 +447,7 @@ export function TopMenu() {
                 aria-label={cartLabel}
                 onClick={closeMenu}
               >
+                <span className="sr-only">{cartLabel}</span>
                 <CartIcon
                   sizeClass="h-6 w-6"
                   totalItems={totalItems}

@@ -45,7 +45,8 @@ export default async function HomePage() {
                 Manjares de Oro Verde
               </h1>
               <p className="text-lead mt-4">
-                Mesas Dulces, personalizadas y pensadas para tu celebración.
+                Mesas dulces personalizadas para eventos, cumpleaños y
+                casamientos.
                 <br />
                 Armá tu pedido y escribinos por WhatsApp: nosotros nos ocupamos
                 del resto.

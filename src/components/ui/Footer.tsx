@@ -56,6 +56,7 @@ export function Footer() {
               className={socialIconClass}
               aria-label={`${SITE_NAME} en Instagram`}
             >
+              <span className="sr-only">Instagram</span>
               <IoLogoInstagram className="size-5" aria-hidden />
             </a>
             <a
@@ -65,6 +66,7 @@ export function Footer() {
               className={socialIconClass}
               aria-label={`${SITE_NAME} en Facebook`}
             >
+              <span className="sr-only">Facebook</span>
               <IoLogoFacebook className="size-5" aria-hidden />
             </a>
             {whatsappUrl ? (
@@ -75,6 +77,7 @@ export function Footer() {
                 className={socialIconClass}
                 aria-label={`Escribir por WhatsApp a ${SITE_NAME}`}
               >
+                <span className="sr-only">WhatsApp</span>
                 <IoLogoWhatsapp className="size-5" aria-hidden />
               </a>
             ) : null}
