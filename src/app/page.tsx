@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { IoArrowForward } from "react-icons/io5";
@@ -12,6 +13,13 @@ import { TextLink } from "@/components/ui/TextLink";
 import { titleFont } from "@/config/fonts";
 import { getActiveCategories } from "@/lib/catalog";
 import { getActivePickupPoints } from "@/lib/pickup-points";
+import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: { absolute: SITE_TITLE },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
   const [categories, pickupPoints] = await Promise.all([

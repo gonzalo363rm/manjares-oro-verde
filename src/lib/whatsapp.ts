@@ -20,6 +20,13 @@ export function getWhatsAppNumber(): string {
   return (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "").replace(/\D/g, "");
 }
 
+/** Chat vacío (footer / contacto). Sin número → null. */
+export function getWhatsAppChatUrl(): string | null {
+  const phone = getWhatsAppNumber();
+  if (!phone) return null;
+  return `https://wa.me/${phone}`;
+}
+
 export function getAppUrl(): string {
   return (
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??

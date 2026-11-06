@@ -1,13 +1,19 @@
+import type { Metadata } from "next";
+
 import { CategoryTabs } from "@/components/catalog/CategoryTabs";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { TextLink } from "@/components/ui/TextLink";
 import { getActiveCategories, getCatalogProducts } from "@/lib/catalog";
 import { toNumber } from "@/lib/order-money";
+import { SITE_NAME } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Catálogo | Manjares de Oro Verde",
+export const metadata: Metadata = {
+  title: `Catálogo | ${SITE_NAME}`,
+  description:
+    "Explorá el catálogo de mesas dulces y productos de Manjares de Oro Verde. Sumá al carrito y pedí por WhatsApp.",
+  alternates: { canonical: "/catalogo" },
 };
 
 export default async function CatalogoPage() {

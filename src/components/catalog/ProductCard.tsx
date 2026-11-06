@@ -114,7 +114,7 @@ export function ProductCard({
                 <CloudinaryImage
                   publicId={secondary.publicId}
                   version={secondary.version}
-                  alt=""
+                  alt={`${name} — vista alternativa`}
                   fill
                   quality="best"
                   className="object-cover opacity-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"

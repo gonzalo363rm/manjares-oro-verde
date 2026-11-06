@@ -20,7 +20,10 @@ export async function generateMetadata({ params }: Props) {
   if (!category) return { title: "Catálogo" };
   return {
     title: `${category.name} | Catálogo`,
-    description: category.description || undefined,
+    description:
+      category.description?.trim() ||
+      `Productos de ${category.name} en Manjares de Oro Verde. Pedí por WhatsApp.`,
+    alternates: { canonical: `/catalogo/${slug}` },
   };
 }
 

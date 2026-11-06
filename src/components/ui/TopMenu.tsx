@@ -72,7 +72,7 @@ function UserAvatar({
     return (
       <Image
         src={image}
-        alt=""
+        alt="Foto de perfil"
         width={size}
         height={size}
         className="rounded-full object-cover"
@@ -357,8 +357,8 @@ export function TopMenu() {
             <span className="announcement-bar__sep" aria-hidden>
               ◆
             </span>
-            Envíos a acordar para Paraná, Colonia Avellaneda, Colonia Ensayo y
-            zonas aledañas
+            Envíos a acordar para Paraná, Santa Fe, Colonia Avellaneda, Colonia
+            Ensayo y zonas aledañas
           </p>
         </div>
 
@@ -372,7 +372,7 @@ export function TopMenu() {
             >
               <Image
                 src="/branding/icon-cuted-coco.png"
-                alt=""
+                alt="Manjares de Oro Verde"
                 width={479}
                 height={305}
                 priority

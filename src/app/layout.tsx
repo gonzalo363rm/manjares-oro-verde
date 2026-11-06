@@ -6,25 +6,29 @@ import { CartSeedProvider } from "@/components/cart/cart-seed-context";
 import { CartSync } from "@/components/cart/CartSync";
 import { PostWhatsAppModal } from "@/components/orders/PostWhatsAppModal";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Footer } from "@/components/ui/Footer";
 import { TopMenu } from "@/components/ui/TopMenu";
 import { dmSans, inter } from "@/config/fonts";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  getSiteUrl,
+} from "@/lib/site";
 
 import "./globals.css";
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-  "http://localhost:3000";
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    template: "%s | Manjares de Oro Verde",
-    absolute: "Manjares de Oro Verde — Mesas dulces",
+    template: `%s | ${SITE_NAME}`,
+    absolute: SITE_TITLE,
   },
-  description:
-    "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden.",
-  applicationName: "Manjares de Oro Verde",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   keywords: [
     "mesas dulces",
     "Manjares de Oro Verde",
@@ -32,6 +36,12 @@ export const metadata: Metadata = {
     "eventos",
     "cumpleaños",
     "casamientos",
+    "Oro Verde",
+    "Paraná",
+    "Santa Fe",
+    "mesas dulces Santa Fe",
+    "mesas dulces Paraná",
+    "mesas dulces Oro Verde",
   ],
   icons: {
     icon: [
@@ -44,24 +54,23 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_AR",
-    siteName: "Manjares de Oro Verde",
-    title: "Manjares de Oro Verde — Mesas dulces",
-    description:
-      "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden.",
+    url: siteUrl,
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [
       {
         url: "/branding/logo.jpg",
         width: 1200,
         height: 1200,
-        alt: "Manjares de Oro Verde",
+        alt: SITE_NAME,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Manjares de Oro Verde — Mesas dulces",
-    description:
-      "Mesas dulces personalizadas para tu evento. Pedí por WhatsApp y seguí tu orden.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: ["/branding/logo.jpg"],
   },
 };
@@ -81,11 +90,12 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="es">
+    <html lang="es-AR">
       <body
         className={`${inter.className} ${dmSans.variable} antialiased`}
         suppressHydrationWarning
       >
+        <JsonLd />
         <SessionProvider>
           <CartSeedProvider initialServerCart={initialServerCart}>
             <main className="flex min-h-screen flex-col">
