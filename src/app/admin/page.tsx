@@ -54,6 +54,11 @@ export default async function AdminHomePage() {
           description="Portadas y orden del catálogo"
         />
         <AdminCard
+          href="/admin/puntos-retiro"
+          title="Puntos de retiro"
+          description="Mapas de Google para retirar pedidos"
+        />
+        <AdminCard
           href="/admin/ventas"
           title="Ventas"
           description="Unidades y montos por producto o categoría"

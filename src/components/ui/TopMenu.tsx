@@ -32,6 +32,7 @@ const ADMIN_LINKS = [
   { href: "/admin/pedidos", label: "Gestionar pedidos" },
   { href: "/admin/productos", label: "Productos" },
   { href: "/admin/categorias", label: "Categorías" },
+  { href: "/admin/puntos-retiro", label: "Puntos de retiro" },
   { href: "/admin/ventas", label: "Ventas" },
 ] as const;
 

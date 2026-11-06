@@ -37,6 +37,9 @@ export async function deleteCategory(
     if (category.imagePublicId) {
       await destroyCloudinaryAsset(category.imagePublicId);
     }
+    if (category.hoverImagePublicId) {
+      await destroyCloudinaryAsset(category.hoverImagePublicId);
+    }
   });
 
   return { ok: true };

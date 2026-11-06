@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { IoArrowForward } from "react-icons/io5";
 
 import { CategoryCard } from "@/components/catalog/CategoryCard";
+import { PickupPointsSection } from "@/components/home/PickupPointsSection";
 import { WhatsAppInquiryButton } from "@/components/orders/WhatsAppInquiryButton";
 import { HomeScrollToSection } from "@/components/ui/HomeScrollToSection";
 import { Reveal } from "@/components/ui/Reveal";
@@ -10,9 +11,13 @@ import { ScrollToSectionLink } from "@/components/ui/ScrollToSectionLink";
 import { TextLink } from "@/components/ui/TextLink";
 import { titleFont } from "@/config/fonts";
 import { getActiveCategories } from "@/lib/catalog";
+import { getActivePickupPoints } from "@/lib/pickup-points";
 
 export default async function HomePage() {
-  const categories = await getActiveCategories();
+  const [categories, pickupPoints] = await Promise.all([
+    getActiveCategories(),
+    getActivePickupPoints(),
+  ]);
 
   return (
     <div className="pb-16">
@@ -161,6 +166,10 @@ export default async function HomePage() {
         <div id="consulta">
           <WhatsAppInquiryButton />
         </div>
+      </Reveal>
+
+      <Reveal>
+        <PickupPointsSection points={pickupPoints} />
       </Reveal>
     </div>
   );
