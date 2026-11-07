@@ -6,4 +6,5 @@ export {
   deleteCategoryFormAction,
 } from "./delete-category";
 export { reorderCategories } from "./reorder-categories";
+export { setCategoryShowOnHome } from "./set-category-show-on-home";
 export type { CreateCategoryInput, UpdateCategoryInput } from "./schemas";

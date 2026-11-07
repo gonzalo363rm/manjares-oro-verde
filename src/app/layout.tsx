@@ -4,7 +4,6 @@ import { getCart } from "@/actions/cart";
 import { auth } from "@/auth";
 import { CartSeedProvider } from "@/components/cart/cart-seed-context";
 import { CartSync } from "@/components/cart/CartSync";
-import { PostWhatsAppModal } from "@/components/orders/PostWhatsAppModal";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -105,7 +104,6 @@ export default async function RootLayout({
               <div className="flex-1">{children}</div>
               <Footer />
             </main>
-            <PostWhatsAppModal />
             <CartSync serverSeeded={initialServerCart != null} />
           </CartSeedProvider>
         </SessionProvider>

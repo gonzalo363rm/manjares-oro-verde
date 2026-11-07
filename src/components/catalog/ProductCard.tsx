@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 import { AddToCartButton } from "@/components/catalog/AddToCartButton";
+import { ShareProductButton } from "@/components/catalog/ShareProductButton";
 import { CloudinaryImage } from "@/components/ui/CloudinaryImage";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,9 @@ type Props = {
   unitNote: string | null;
   description?: string | null;
   images: Image[];
+  categorySlug?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export function ProductCard({
@@ -39,9 +43,20 @@ export function ProductCard({
   unitNote,
   description,
   images,
+  categorySlug,
+  open: openControlled,
+  onOpenChange,
 }: Props) {
-  const [open, setOpen] = useState(false);
+  const [openUncontrolled, setOpenUncontrolled] = useState(false);
   const [index, setIndex] = useState(0);
+
+  const controlled = openControlled !== undefined;
+  const open = controlled ? openControlled : openUncontrolled;
+
+  function setOpen(next: boolean) {
+    if (!controlled) setOpenUncontrolled(next);
+    onOpenChange?.(next);
+  }
 
   const primary = images[0];
   const secondary = images[1];
@@ -57,10 +72,20 @@ export function ProductCard({
       })
     : undefined;
 
+  const sharePath = categorySlug
+    ? `/catalogo/${categorySlug}?producto=${encodeURIComponent(slug)}`
+    : `/catalogo?producto=${encodeURIComponent(slug)}`;
+
+  function shareUrl() {
+    if (typeof window === "undefined") return sharePath;
+    return `${window.location.origin}${sharePath}`;
+  }
+
   useEffect(() => {
     if (!open) return;
 
     function onKeyDown(e: KeyboardEvent) {
+      if (images.length <= 1) return;
       if (e.key === "ArrowLeft") {
         e.preventDefault();
         setIndex((i) => (i - 1 + images.length) % images.length);
@@ -74,8 +99,15 @@ export function ProductCard({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, images.length]);
 
+  useEffect(() => {
+    if (!open) return;
+    setIndex(0);
+    document
+      .getElementById(`producto-${slug}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [open, slug]);
+
   function openPreview() {
-    if (!hasImages) return;
     setIndex(0);
     setOpen(true);
   }
@@ -88,17 +120,19 @@ export function ProductCard({
     setIndex((i) => (i + 1) % images.length);
   }
 
+  const cartProduct = { id, name, slug, price, image: cartImage };
+
   return (
     <>
-      <article className="card-lift group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <article
+        id={`producto-${slug}`}
+        className="card-lift group flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
+      >
         <button
           type="button"
-          className={`relative aspect-square w-full shrink-0 overflow-hidden bg-stone-100 text-left ${
-            hasImages ? "cursor-pointer" : "cursor-default"
-          }`}
+          className="relative aspect-square w-full shrink-0 cursor-pointer overflow-hidden bg-stone-100 text-left"
           onClick={openPreview}
-          disabled={!hasImages}
-          aria-label={hasImages ? `Ver fotos de ${name}` : undefined}
+          aria-label={`Ver ${name}`}
         >
           {primary ? (
             <>
@@ -145,9 +179,10 @@ export function ProductCard({
             <p className="font-medium text-emerald-900">
               {formatMoneyARS(price)}
             </p>
-            <AddToCartButton
-              product={{ id, name, slug, price, image: cartImage }}
-            />
+            <div className="flex items-center gap-1.5">
+              <ShareProductButton name={name} url={shareUrl()} />
+              <AddToCartButton product={cartProduct} />
+            </div>
           </div>
         </div>
       </article>
@@ -168,7 +203,11 @@ export function ProductCard({
                 className="object-contain"
                 sizes="(min-width: 640px) 40rem, 100vw"
               />
-            ) : null}
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-stone-400">
+                Sin imagen
+              </div>
+            )}
 
             {images.length > 1 ? (
               <>
@@ -199,7 +238,7 @@ export function ProductCard({
             ) : null}
           </div>
 
-          <DialogHeader className="space-y-2 px-4 pt-3 pb-4 text-left">
+          <DialogHeader className="space-y-3 px-4 pt-3 pb-4 text-left">
             <DialogTitle>{name}</DialogTitle>
             {unitNote ? (
               <p className="text-xs text-muted-foreground">{unitNote}</p>
@@ -213,9 +252,20 @@ export function ProductCard({
                 Vista previa de {name}
               </DialogDescription>
             )}
-            <p className="font-medium text-emerald-900">
-              {formatMoneyARS(price)}
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <p className="font-medium text-emerald-900">
+                {formatMoneyARS(price)}
+              </p>
+              <div className="flex items-center gap-2">
+                <ShareProductButton
+                  name={name}
+                  url={shareUrl()}
+                  size="sm"
+                  label="Compartir"
+                />
+                <AddToCartButton product={cartProduct} />
+              </div>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>

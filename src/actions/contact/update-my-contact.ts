@@ -32,8 +32,8 @@ export async function updateMyContact(
   await prisma.user.update({
     where: { id: userId },
     data: {
-      contactName,
-      contactPhone,
+      contactName: contactName.trim() || null,
+      contactPhone: contactPhone.trim() || null,
       contactEmail: contactEmail?.trim() || null,
     },
   });

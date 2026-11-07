@@ -55,8 +55,9 @@ export function ProductForm({ categories, initial }: Props) {
     initial?.price != null ? String(initial.price) : ""
   );
   const [unitNote, setUnitNote] = useState(initial?.unitNote ?? "");
-  const [categoryId, setCategoryId] = useState(
-    initial?.categoryId ?? categories[0]?.id ?? ""
+  const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
+  const sortedCategories = [...categories].sort((a, b) =>
+    a.name.localeCompare(b.name, "es", { sensitivity: "base" })
   );
   const [active, setActive] = useState(initial?.active ?? true);
   const [retailerId, setRetailerId] = useState(initial?.retailerId ?? "");
@@ -70,6 +71,10 @@ export function ProductForm({ categories, initial }: Props) {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!categoryId) {
+      setError("Elegí una categoría");
+      return;
+    }
     const payload = {
       name,
       description,
@@ -117,12 +122,15 @@ export function ProductForm({ categories, initial }: Props) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="category">Categoría</Label>
-          <Select value={categoryId} onValueChange={setCategoryId}>
+          <Select
+            value={categoryId || undefined}
+            onValueChange={setCategoryId}
+          >
             <SelectTrigger id="category" className="w-full">
               <SelectValue placeholder="Elegí categoría" />
             </SelectTrigger>
             <SelectContent>
-              {categories.map((c) => (
+              {sortedCategories.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
                   {c.name}
                 </SelectItem>

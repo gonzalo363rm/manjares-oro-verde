@@ -47,19 +47,20 @@ export function ContactForm({ initial }: Props) {
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="my-name">
-          Nombre <span className="text-destructive">*</span>
+          Nombre{" "}
+          <span className="font-normal text-muted-foreground">(opcional)</span>
         </Label>
         <Input
           id="my-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           autoComplete="name"
-          required
         />
       </div>
       <div className="space-y-2">
         <Label htmlFor="my-phone">
-          Teléfono <span className="text-destructive">*</span>
+          Teléfono{" "}
+          <span className="font-normal text-muted-foreground">(opcional)</span>
         </Label>
         <Input
           id="my-phone"
@@ -67,7 +68,6 @@ export function ContactForm({ initial }: Props) {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           autoComplete="tel"
-          required
         />
       </div>
       <div className="space-y-2">

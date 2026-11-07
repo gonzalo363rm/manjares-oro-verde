@@ -18,19 +18,24 @@ export function CartSync({ serverSeeded = false }: Props) {
   const enterGuestMode = useCartStore((s) => s.enterGuestMode);
   const reloadFromServer = useCartStore((s) => s.reloadFromServer);
   const didInitialUserLoad = useRef(serverSeeded);
+  const mergeStarted = useRef(false);
 
   useEffect(() => {
     if (!hydrated) return;
 
     if (status === "authenticated" && mode !== "user") {
+      if (mergeStarted.current) return;
+      mergeStarted.current = true;
       void mergeOnLogin();
     } else if (status === "authenticated" && mode === "user") {
+      mergeStarted.current = false;
       if (!didInitialUserLoad.current) {
         didInitialUserLoad.current = true;
         void reloadFromServer();
       }
     } else if (status === "unauthenticated" && mode === "user") {
       didInitialUserLoad.current = false;
+      mergeStarted.current = false;
       enterGuestMode();
     }
   }, [

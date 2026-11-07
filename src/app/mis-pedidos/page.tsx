@@ -34,8 +34,8 @@ export default async function MisPedidosPage() {
 
       {orders.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-600">
-          Todavía no tenés pedidos vinculados. Cuando armes uno por WhatsApp y
-          confirmes, van a aparecer acá.
+          Todavía no tenés pedidos. Cuando armes uno por WhatsApp estando
+          conectado con esta cuenta, van a aparecer acá.
         </div>
       ) : (
         <ul className="space-y-3">

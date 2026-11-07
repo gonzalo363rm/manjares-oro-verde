@@ -16,16 +16,14 @@ description: Dominio y reglas de Manjares de Oro Verde (mesas dulces, carrito, �
 
 ## Órdenes
 
-1. **Login obligatorio** para pedir. Sin sesión: se guarda borrador `manjares-order-draft-v1` y redirect a `/auth/login?callbackUrl=/carrito?resume=1`. Al volver se restauran datos; el usuario debe tocar de nuevo el botón (no se abre WA solo).
-2. Al tocar **Pedir por WhatsApp** con sesión → `createOrder` crea orden `PENDIENTE_CONFIRMACION` con `userId` y código `MOV-XXXXXX`.
+1. Al tocar **Pedir por WhatsApp** → `createOrder` crea orden `PENDIENTE_CONFIRMACION` con código `MOV-XXXXXX` (con `userId` si hay sesión; guests OK).
+2. Contacto/teléfono opcionales (carrito y “Mis datos”).
 3. El mensaje WA incluye código + link `/pedido/[code]`.
-4. Reutilizar código si el `cartHash` no cambió (mismo usuario, pendiente).
-5. Modal post-WA **solo** tras ese CTA (flag `manjares-awaiting-order-confirm`).
-6. Consulta fuera de catálogo → `buildInquiryMessage` **sin** orden ni modal.
-7. Sí en el modal → clear cart (también en DB si modo user) + mensaje historial/reseñas. No hay claim anónimo.
-8. Vista pública `/pedido/[code]`: sin login; enmascarar teléfono/nombre/dirección; muestra descuento si hay; `noindex`.
-9. Admin `/admin/pedidos`: estado libre, seña, envío+dirección, descuento, total override, ítems (catálogo o libres), `OrderChangeLog`; `remaining = total - deposit` (no persistir). `confirmedAt` al salir de pendiente (ventas).
-10. Aviso admin: badge pendientes + email SMTP en `after()` al crear pedido nuevo.
+4. Reutilizar código si el `cartHash` no cambió (mismo dueño, pendiente).
+5. Consulta fuera de catálogo → `buildInquiryMessage` **sin** orden.
+6. Vista pública `/pedido/[code]`: sin login; enmascarar teléfono/nombre/dirección; muestra descuento si hay; `noindex`.
+7. Admin `/admin/pedidos`: estado libre, seña, envío+dirección, descuento, total override, ítems (catálogo o libres), `OrderChangeLog`; `remaining = total - deposit` (no persistir). `confirmedAt` al salir de pendiente (ventas).
+8. Aviso admin: badge pendientes + email SMTP en `after()` al crear pedido nuevo.
 
 ## Carrito
 

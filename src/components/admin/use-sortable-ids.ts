@@ -6,16 +6,23 @@ type ReorderFn = (
   raw: { orderedIds: string[] }
 ) => Promise<{ ok: true } | { ok: false; error: string }>;
 
-function syncKey<T extends { id: string; active?: boolean }>(items: T[]) {
+function syncKey<
+  T extends { id: string; active?: boolean; showOnHome?: boolean },
+>(items: T[]) {
   return items
-    .map((i) => `${i.id}:${i.active === undefined ? "" : i.active ? "1" : "0"}`)
+    .map((i) => {
+      const active =
+        i.active === undefined ? "" : i.active ? "1" : "0";
+      const home =
+        i.showOnHome === undefined ? "" : i.showOnHome ? "1" : "0";
+      return `${i.id}:${active}:${home}`;
+    })
     .join(",");
 }
 
-export function useSortableIds<T extends { id: string; active?: boolean }>(
-  initialItems: T[],
-  reorder: ReorderFn
-) {
+export function useSortableIds<
+  T extends { id: string; active?: boolean; showOnHome?: boolean },
+>(initialItems: T[], reorder: ReorderFn) {
   const [items, setItems] = useState(initialItems);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();

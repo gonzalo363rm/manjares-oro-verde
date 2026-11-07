@@ -53,11 +53,11 @@ export function CatalogFrame({ categories, children }: Props) {
   return (
     <div className="page-gutter space-y-6 py-8">
       <header>
+        <TextLink href="/" icon="back">
+          Inicio
+        </TextLink>
         {isAll ? (
           <>
-            <TextLink href="/" icon="back">
-              Inicio
-            </TextLink>
             <h1 className="mt-2 text-3xl font-bold text-stone-900">Catálogo</h1>
             <p className="mt-1 text-sm text-stone-600">
               Elegí productos para tu evento
@@ -65,13 +65,6 @@ export function CatalogFrame({ categories, children }: Props) {
           </>
         ) : (
           <>
-            <TextLink
-              href="/catalogo"
-              icon="back"
-              onClick={() => setOptimisticPath("/catalogo")}
-            >
-              Catálogo
-            </TextLink>
             <h1 className="mt-2 text-3xl font-bold text-stone-900">
               {category?.name ?? "Categoría"}
             </h1>

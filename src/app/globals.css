@@ -440,32 +440,41 @@ body {
 }
 
 @media (max-width: 768px) {
+  .home-viewport {
+    min-height: min(85dvh, 720px);
+  }
+
+  /* Wash hasta past CTAs (link catálogo); foto nítida más abajo */
   .hero-band__wash {
     background: linear-gradient(
       180deg,
       var(--hero-soft) 0%,
-      color-mix(in srgb, var(--hero-soft) 92%, transparent) 35%,
-      color-mix(in srgb, var(--hero-soft) 50%, transparent) 65%,
-      transparent 100%
+      color-mix(in srgb, var(--hero-soft) 96%, transparent) 36%,
+      color-mix(in srgb, var(--hero-soft) 78%, transparent) 52%,
+      color-mix(in srgb, var(--hero-soft) 35%, transparent) 68%,
+      color-mix(in srgb, var(--hero-soft) 12%, transparent) 80%,
+      transparent 90%
     );
   }
 
   .hero-band__image {
     left: 0;
-    background-position: 65% center;
+    background-position: center 40%;
     background-size: cover;
-    opacity: 0.7;
+    opacity: 1;
     -webkit-mask-image: linear-gradient(
       180deg,
       transparent 0%,
-      rgba(0, 0, 0, 0.35) 28%,
-      #000 58%
+      rgba(0, 0, 0, 0.2) 30%,
+      rgba(0, 0, 0, 0.65) 48%,
+      #000 62%
     );
     mask-image: linear-gradient(
       180deg,
       transparent 0%,
-      rgba(0, 0, 0, 0.35) 28%,
-      #000 58%
+      rgba(0, 0, 0, 0.2) 30%,
+      rgba(0, 0, 0, 0.65) 48%,
+      #000 62%
     );
   }
 }

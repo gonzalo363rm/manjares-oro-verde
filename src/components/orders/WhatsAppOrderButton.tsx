@@ -1,7 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { IoLogoWhatsapp } from "react-icons/io5";
 
@@ -12,11 +10,9 @@ import { hashCartPayload } from "@/lib/cart-hash";
 import {
   getPendingCartHash,
   getPendingOrderCode,
-  setAwaitingConfirm,
+  setPendingOrderMeta,
 } from "@/lib/order-pending-ls";
 import { useCartStore } from "@/store/cart/cart-store";
-
-export const LS_ORDER_DRAFT = "manjares-order-draft-v1";
 
 export type EventFormValues = {
   contactName: string;
@@ -32,40 +28,13 @@ type Props = {
   event: EventFormValues;
   className?: string;
   label?: string;
-  onValidationError?: (field: "contactName" | "contactPhone") => void;
 };
-
-export function saveOrderDraft(event: EventFormValues) {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(LS_ORDER_DRAFT, JSON.stringify(event));
-  } catch {
-    // ignore quota / private mode
-  }
-}
-
-export function consumeOrderDraft(): EventFormValues | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(LS_ORDER_DRAFT);
-    if (!raw) return null;
-    localStorage.removeItem(LS_ORDER_DRAFT);
-    const parsed = JSON.parse(raw) as EventFormValues;
-    if (!parsed || typeof parsed !== "object") return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
 
 export function WhatsAppOrderButton({
   event,
   className,
   label = "Pedir por WhatsApp",
-  onValidationError,
 }: Props) {
-  const { status } = useSession();
-  const router = useRouter();
   const cart = useCartStore((s) => s.cart);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,24 +44,6 @@ export function WhatsAppOrderButton({
 
     if (cart.length === 0) {
       setError("El carrito está vacío");
-      return;
-    }
-    if (!event.contactName.trim()) {
-      setError("Completá tu nombre");
-      onValidationError?.("contactName");
-      return;
-    }
-    if (!event.contactPhone.trim()) {
-      setError("Completá tu teléfono");
-      onValidationError?.("contactPhone");
-      return;
-    }
-
-    if (status !== "authenticated") {
-      saveOrderDraft(event);
-      router.push(
-        `/auth/login?callbackUrl=${encodeURIComponent("/carrito?resume=1")}`
-      );
       return;
     }
 
@@ -136,7 +87,7 @@ export function WhatsAppOrderButton({
         return;
       }
 
-      setAwaitingConfirm(result.code, cartHash);
+      setPendingOrderMeta(result.code, cartHash);
       if (waWindow) {
         waWindow.location.href = result.waUrl;
       } else {

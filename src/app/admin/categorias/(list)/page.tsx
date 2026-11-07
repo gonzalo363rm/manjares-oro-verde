@@ -26,6 +26,7 @@ export default async function AdminCategoriasPage() {
             id: c.id,
             name: c.name,
             active: c.active,
+            showOnHome: c.showOnHome,
             productCount: c._count.products,
           }))}
         />

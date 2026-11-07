@@ -39,11 +39,10 @@ export async function createOrder(
 
   const session = await auth();
   const userId = session?.user?.id ?? null;
-  if (!userId) {
-    return { ok: false, error: "Tenés que iniciar sesión para pedir" };
-  }
 
   const data = parsed.data;
+  const contactName = data.contactName.trim();
+  const contactPhone = data.contactPhone.trim();
 
   if (data.existingCode) {
     const code = normalizeOrderCode(data.existingCode);
@@ -52,11 +51,16 @@ export async function createOrder(
       include: { items: true },
     });
 
+    const sameOwner =
+      existing?.userId != null
+        ? existing.userId === userId
+        : userId == null;
+
     if (
       existing &&
       existing.cartHash === data.cartHash &&
       existing.status === "PENDIENTE_CONFIRMACION" &&
-      existing.userId === userId
+      sameOwner
     ) {
       const waItems: WaCartItem[] = existing.items.map((i) => ({
         name: i.productName,
@@ -126,20 +130,22 @@ export async function createOrder(
   const contactEmail = data.contactEmail?.trim() || null;
 
   const order = await prisma.$transaction(async (tx) => {
-    const user = await tx.user.findUnique({
-      where: { id: userId },
-      select: { contactPhone: true },
-    });
-
-    if (user && !user.contactPhone?.trim()) {
-      await tx.user.update({
+    if (userId) {
+      const user = await tx.user.findUnique({
         where: { id: userId },
-        data: {
-          contactName: data.contactName,
-          contactPhone: data.contactPhone,
-          contactEmail,
-        },
+        select: { contactPhone: true },
       });
+
+      if (user && !user.contactPhone?.trim() && contactPhone) {
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            contactName: contactName || null,
+            contactPhone,
+            contactEmail,
+          },
+        });
+      }
     }
 
     return tx.order.create({
@@ -147,8 +153,8 @@ export async function createOrder(
         code,
         status: "PENDIENTE_CONFIRMACION",
         userId,
-        contactName: data.contactName,
-        contactPhone: data.contactPhone,
+        contactName,
+        contactPhone,
         contactEmail,
         eventDate,
         eventType: data.eventType || null,

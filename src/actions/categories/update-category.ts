@@ -65,6 +65,7 @@ export async function updateCategory(
       slug,
       description: data.description ?? "",
       active: data.active ?? true,
+      showOnHome: data.showOnHome ?? true,
       imagePublicId: nextPublicId,
       imageVersion: nextVersion,
       hoverImagePublicId: nextHoverPublicId,

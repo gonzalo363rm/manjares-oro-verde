@@ -24,6 +24,7 @@ type Props = {
     slug: string;
     description: string;
     active: boolean;
+    showOnHome: boolean;
     imagePublicId: string | null;
     imageVersion: number | null;
     hoverImagePublicId?: string | null;
@@ -62,6 +63,7 @@ export function CategoryForm({ initial }: Props) {
   const [name, setName] = useState(initial?.name ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [active, setActive] = useState(initial?.active ?? true);
+  const [showOnHome, setShowOnHome] = useState(initial?.showOnHome ?? true);
   const [images, setImages] = useState<UploadedImage[]>(() =>
     imagesFromInitial(initial)
   );
@@ -74,6 +76,7 @@ export function CategoryForm({ initial }: Props) {
     setName("");
     setDescription("");
     setActive(true);
+    setShowOnHome(true);
     setImages([]);
     setError(null);
   }
@@ -93,6 +96,7 @@ export function CategoryForm({ initial }: Props) {
         name,
         description,
         active,
+        showOnHome,
         image: cover,
         hoverImage: hover,
       };
@@ -139,7 +143,15 @@ export function CategoryForm({ initial }: Props) {
           checked={active}
           onCheckedChange={setActive}
         />
-        <Label htmlFor="cat-active">Activa</Label>
+        <Label htmlFor="cat-active">Activa en el catálogo</Label>
+      </div>
+      <div className="flex items-center gap-3">
+        <Switch
+          id="cat-home"
+          checked={showOnHome}
+          onCheckedChange={setShowOnHome}
+        />
+        <Label htmlFor="cat-home">Mostrar en la home</Label>
       </div>
       <div className="space-y-2">
         <Label>Fotos</Label>

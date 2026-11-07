@@ -5,9 +5,9 @@ alwaysApply: true
 
 # Dominio Manjares (resumen operativo)
 
-- Pedido WA → exige sesión; `createOrder` **antes** de abrir `wa.me`; código `MOV-XXXXXX` + link `/pedido/[code]`.
-- Sin sesión al pedir → borrador en `manjares-order-draft-v1` + login con `callbackUrl=/carrito?resume=1` (no se abre WA solo al volver).
-- Modal post-WA solo si se setea el flag de pedido; Sí → clear cart + historial; consulta fuera de catálogo **no** crea orden ni modal.
+- Pedido WA → sin login obligatorio; `createOrder` **antes** de abrir `wa.me`; código `MOV-XXXXXX` + link `/pedido/[code]` (`userId` si hay sesión).
+- Contacto/teléfono opcionales en carrito y “Mis datos”.
+- Consulta fuera de catálogo **no** crea orden.
 - Carrito: invitado en LS (`manjares-cart-v1`); al login `mergeGuestCart` y modo user (DB); al logout vuelve a guest vacío.
 - `/pedido/[code]` pública, datos sensibles enmascarados, `noindex`.
 - Admin pedidos: seña, envío, descuento/override, ítems, total, estado; `remaining` calculado; aviso pendientes (badge + email SMTP).

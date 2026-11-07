@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { useOptimistic, useTransition } from "react";
 import { IoMenu } from "react-icons/io5";
 
 import {
   deleteCategoryFormAction,
   reorderCategories,
+  setCategoryShowOnHome,
 } from "@/actions/categories";
 import { useSortableIds } from "@/components/admin/use-sortable-ids";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -23,6 +26,7 @@ export type AdminCategoryRow = {
   id: string;
   name: string;
   active: boolean;
+  showOnHome: boolean;
   productCount: number;
 };
 
@@ -31,6 +35,15 @@ type Props = {
 };
 
 export function AdminCategoriesSortableList({ categories }: Props) {
+  const [pendingHome, startHomeTransition] = useTransition();
+  const [optimisticCategories, setOptimisticHome] = useOptimistic(
+    categories,
+    (current, update: { id: string; showOnHome: boolean }) =>
+      current.map((c) =>
+        c.id === update.id ? { ...c, showOnHome: update.showOnHome } : c
+      )
+  );
+
   const {
     items,
     error,
@@ -40,7 +53,14 @@ export function AdminCategoriesSortableList({ categories }: Props) {
     onDragOver,
     onDragEnd,
     onDrop,
-  } = useSortableIds(categories, reorderCategories);
+  } = useSortableIds(optimisticCategories, reorderCategories);
+
+  function toggleHome(category: AdminCategoryRow, next: boolean) {
+    startHomeTransition(async () => {
+      setOptimisticHome({ id: category.id, showOnHome: next });
+      await setCategoryShowOnHome(category.id, next);
+    });
+  }
 
   return (
     <div className="space-y-2">
@@ -49,7 +69,7 @@ export function AdminCategoriesSortableList({ categories }: Props) {
       </p>
       <div
         className={`overflow-hidden rounded-2xl border border-border bg-card ${
-          pending ? "opacity-70" : ""
+          pending || pendingHome ? "opacity-70" : ""
         }`}
       >
         <Table>
@@ -59,6 +79,7 @@ export function AdminCategoriesSortableList({ categories }: Props) {
               <TableHead>Nombre</TableHead>
               <TableHead>Productos</TableHead>
               <TableHead>Estado</TableHead>
+              <TableHead>Home</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
@@ -94,6 +115,13 @@ export function AdminCategoriesSortableList({ categories }: Props) {
                   <Badge variant={c.active ? "default" : "outline"}>
                     {c.active ? "Activa" : "Inactiva"}
                   </Badge>
+                </TableCell>
+                <TableCell>
+                  <Switch
+                    checked={c.showOnHome}
+                    onCheckedChange={(checked) => toggleHome(c, checked)}
+                    aria-label={`Mostrar ${c.name} en la home`}
+                  />
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">

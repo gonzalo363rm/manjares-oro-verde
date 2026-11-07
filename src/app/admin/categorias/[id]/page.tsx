@@ -43,6 +43,7 @@ export default async function EditarCategoriaPage({ params }: Props) {
               slug: category.slug,
               description: category.description,
               active: category.active,
+              showOnHome: category.showOnHome,
               imagePublicId: category.imagePublicId,
               imageVersion: category.imageVersion,
               hoverImagePublicId: category.hoverImagePublicId,

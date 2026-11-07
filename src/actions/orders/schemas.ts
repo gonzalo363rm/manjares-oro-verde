@@ -7,8 +7,8 @@ export const createOrderItemSchema = z.object({
 
 export const createOrderSchema = z.object({
   items: z.array(createOrderItemSchema).min(1),
-  contactName: z.string().trim().min(2).max(120),
-  contactPhone: z.string().trim().min(6).max(40),
+  contactName: z.string().trim().max(120).default(""),
+  contactPhone: z.string().trim().max(40).default(""),
   contactEmail: z
     .union([z.string().trim().email().max(160), z.literal(""), z.null()])
     .optional(),

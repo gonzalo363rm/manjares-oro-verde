@@ -54,6 +54,7 @@ export async function createCategory(
       description: data.description ?? "",
       sortOrder,
       active: data.active ?? true,
+      showOnHome: data.showOnHome ?? true,
       imagePublicId: data.image?.publicId ?? null,
       imageVersion: data.image?.version ?? null,
       hoverImagePublicId: data.hoverImage?.publicId ?? null,

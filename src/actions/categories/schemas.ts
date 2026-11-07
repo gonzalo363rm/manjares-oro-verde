@@ -12,6 +12,7 @@ export const createCategorySchema = z.object({
   name: z.string().trim().min(2).max(80),
   description: z.string().trim().max(500).optional().default(""),
   active: z.boolean().optional().default(true),
+  showOnHome: z.boolean().optional().default(true),
   image: categoryImageSchema,
   hoverImage: categoryImageSchema,
 });

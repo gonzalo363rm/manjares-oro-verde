@@ -52,7 +52,7 @@ export function WhatsAppInquiryButton({
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
-            placeholder="Ej: mesa dulce temática unicornio para 40 personas, con macarons y alfajores…"
+            placeholder="Ej: mesa dulce temática unicornio para 40 personas, con tartas y alfajores…"
             className="min-h-24 resize-none border-stone-200/80 bg-white/90 shadow-sm backdrop-blur-sm"
           />
           <div className="flex justify-end">

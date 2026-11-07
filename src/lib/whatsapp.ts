@@ -48,8 +48,15 @@ export function buildOrderMessage(
     `Código: ${displayOrderCode(code)}`,
     `Seguimiento: ${buildOrderTrackingUrl(code)}`,
     "",
-    `Contacto: ${event.contactName} — ${event.contactPhone}`,
   ];
+
+  const name = event.contactName.trim();
+  const phone = event.contactPhone.trim();
+  if (name || phone) {
+    lines.push(
+      `Contacto: ${[name, phone].filter(Boolean).join(" — ")}`
+    );
+  }
 
   if (event.contactEmail?.trim()) {
     lines.push(`Email: ${event.contactEmail.trim()}`);

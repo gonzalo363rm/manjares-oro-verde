@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const updateMyContactSchema = z.object({
-  contactName: z.string().trim().min(2).max(120),
-  contactPhone: z.string().trim().min(6).max(40),
+  contactName: z.string().trim().max(120).default(""),
+  contactPhone: z.string().trim().max(40).default(""),
   contactEmail: z
     .string()
     .trim()

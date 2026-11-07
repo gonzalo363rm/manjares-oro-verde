@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { IoArrowForward } from "react-icons/io5";
 
-import { CategoryCard } from "@/components/catalog/CategoryCard";
+import { HomeCategoryRails } from "@/components/home/HomeCategoryRails";
 import { PickupPointsSection } from "@/components/home/PickupPointsSection";
 import { WhatsAppInquiryButton } from "@/components/orders/WhatsAppInquiryButton";
 import { HomeScrollToSection } from "@/components/ui/HomeScrollToSection";
@@ -11,7 +11,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { ScrollToSectionLink } from "@/components/ui/ScrollToSectionLink";
 import { TextLink } from "@/components/ui/TextLink";
 import { titleFont } from "@/config/fonts";
-import { getActiveCategories } from "@/lib/catalog";
+import { getHomeCategoryRails } from "@/lib/catalog";
 import { getActivePickupPoints } from "@/lib/pickup-points";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const [categories, pickupPoints] = await Promise.all([
-    getActiveCategories(),
+    getHomeCategoryRails(),
     getActivePickupPoints(),
   ]);
 
@@ -90,31 +90,7 @@ export default async function HomePage() {
           </div>
           <TextLink href="/catalogo">Ver todo</TextLink>
         </div>
-        {categories.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-600">
-            Pronto vas a ver acá las categorías del catálogo.
-          </p>
-        ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((c) => {
-              const fallback = c.products[0]?.images[0];
-              return (
-                <CategoryCard
-                  key={c.id}
-                  name={c.name}
-                  slug={c.slug}
-                  description={c.description}
-                  imagePublicId={c.imagePublicId}
-                  imageVersion={c.imageVersion}
-                  hoverImagePublicId={c.hoverImagePublicId}
-                  hoverImageVersion={c.hoverImageVersion}
-                  fallbackPublicId={fallback?.publicId}
-                  fallbackVersion={fallback?.version}
-                />
-              );
-            })}
-          </div>
-        )}
+        <HomeCategoryRails categories={categories} />
       </Reveal>
 
       <section className="page-gutter py-8 sm:py-10">
@@ -138,7 +114,7 @@ export default async function HomePage() {
             {
               step: "02",
               title: "Pedí por WhatsApp",
-              text: "Iniciá sesión, generamos un código y abrimos el chat.",
+              text: "Generamos un código de pedido y abrimos el chat.",
               from: "right" as const,
             },
             {
