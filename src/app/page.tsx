@@ -46,7 +46,8 @@ export default async function HomePage() {
               </h1>
               <p className="text-lead mt-4">
                 Mesas dulces personalizadas para eventos, cumpleaños y
-                casamientos en Oro Verde, Paraná y alrededores.
+                casamientos, o para compartir una tarde en familia. En Oro
+                Verde, Paraná y alrededores.
                 <br />
                 Armá tu pedido y escribinos por WhatsApp: nosotros nos ocupamos
                 del resto.
@@ -56,7 +57,7 @@ export default async function HomePage() {
                   sectionId="consulta"
                   className="group inline-flex h-12 items-center gap-2 rounded-full bg-(--secondary) px-7 text-[15px] font-medium text-white shadow-sm transition-all hover:brightness-95 hover:shadow-md"
                 >
-                  Pedir una cotización para mi evento
+                  Pedir una cotización
                   <IoArrowForward
                     className="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-1"
                     aria-hidden

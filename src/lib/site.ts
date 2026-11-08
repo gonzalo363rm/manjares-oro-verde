@@ -6,7 +6,7 @@ export const SITE_TITLE =
   "Manjares de Oro Verde — Mesas dulces en Oro Verde y Paraná";
 
 export const SITE_DESCRIPTION =
-  "Mesas dulces para cumpleaños, casamientos y eventos en Oro Verde, Paraná y Santa Fe. Pedí por WhatsApp.";
+  "Mesas dulces para eventos, cumpleaños o una tarde en familia en Oro Verde, Paraná y Santa Fe. Pedí por WhatsApp.";
 
 /** Sedes / bases del negocio (schema.org location[]). */
 export const SITE_LOCATIONS = [
@@ -25,7 +25,7 @@ export const SITE_LOCATIONS = [
 ] as const;
 
 export const SITE_FOOTER_BLURB =
-  "Mesas dulces personalizadas con ingredientes de calidad. Pedidos por WhatsApp para Oro Verde, Paraná, Santa Fe y zonas aledañas.";
+  "Mesas dulces personalizadas para eventos o para compartir en casa. Pedidos por WhatsApp para Oro Verde, Paraná, Santa Fe y zonas aledañas.";
 
 export const SITE_SERVICE_AREA =
   "Oro Verde, Paraná y Santa Fe";
