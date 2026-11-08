@@ -1,5 +1,6 @@
 import {
   SITE_DESCRIPTION,
+  SITE_LOCATIONS,
   SITE_NAME,
   SITE_SERVICE_PLACES,
   SOCIAL_LINKS,
@@ -25,6 +26,16 @@ export function JsonLd() {
     url: base,
     image: `${base}/branding/logo.jpg`,
     logo: `${base}/branding/logo.jpg`,
+    location: SITE_LOCATIONS.map((loc) => ({
+      "@type": "Place",
+      name: `${SITE_NAME} — ${loc.name}`,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: loc.addressLocality,
+        addressRegion: loc.addressRegion,
+        addressCountry: loc.addressCountry,
+      },
+    })),
     areaServed: SITE_SERVICE_PLACES.map((name) => ({
       "@type": "Place",
       name,
@@ -38,6 +49,7 @@ export function JsonLd() {
             contactType: "customer service",
             telephone: `+${whatsapp}`,
             availableLanguage: ["Spanish"],
+            areaServed: SITE_SERVICE_PLACES,
           },
         }
       : {}),

@@ -46,7 +46,7 @@ export default async function HomePage() {
               </h1>
               <p className="text-lead mt-4">
                 Mesas dulces personalizadas para eventos, cumpleaños y
-                casamientos.
+                casamientos en Oro Verde, Paraná y alrededores.
                 <br />
                 Armá tu pedido y escribinos por WhatsApp: nosotros nos ocupamos
                 del resto.
