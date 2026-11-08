@@ -68,14 +68,14 @@ export function HomeCategoryRailSlider({
     if (e.pointerType !== "mouse" || e.button !== 0) return;
     const el = scrollerRef.current;
     if (!el) return;
+    // No setPointerCapture aún: si capturamos en el down, el click
+    // no llega al <Link> y el producto no abre.
     dragRef.current = {
       active: true,
       startX: e.clientX,
       startScroll: el.scrollLeft,
       moved: false,
     };
-    setDragging(true);
-    el.setPointerCapture(e.pointerId);
   }
 
   function onPointerMove(e: PointerEvent<HTMLDivElement>) {
@@ -83,18 +83,31 @@ export function HomeCategoryRailSlider({
     const el = scrollerRef.current;
     if (!el) return;
     const dx = e.clientX - dragRef.current.startX;
-    if (Math.abs(dx) > 5) dragRef.current.moved = true;
+    if (Math.abs(dx) <= 5) return;
+
+    if (!dragRef.current.moved) {
+      dragRef.current.moved = true;
+      setDragging(true);
+      try {
+        el.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
     el.scrollLeft = dragRef.current.startScroll - dx;
   }
 
   function endDrag(e: PointerEvent<HTMLDivElement>) {
     if (!dragRef.current.active) return;
+    const wasDragging = dragRef.current.moved;
     dragRef.current.active = false;
     setDragging(false);
-    try {
-      scrollerRef.current?.releasePointerCapture(e.pointerId);
-    } catch {
-      // ignore
+    if (wasDragging) {
+      try {
+        scrollerRef.current?.releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
     }
   }
 
