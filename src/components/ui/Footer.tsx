@@ -36,6 +36,8 @@ export function Footer() {
               width={80}
               height={102}
               className="h-12 object-contain"
+              loading="lazy"
+              decoding="async"
               unoptimized
             />
             <span

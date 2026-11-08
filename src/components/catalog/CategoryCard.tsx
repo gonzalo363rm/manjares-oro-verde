@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { CloudinaryImage } from "@/components/ui/CloudinaryImage";
+import { CloudinaryHoverPair } from "@/components/ui/CloudinaryHoverPair";
 
 type Props = {
   name: string;
@@ -37,28 +37,19 @@ export function CategoryCard({
     >
       <div className="relative aspect-[4/3] bg-stone-100">
         {publicId && version ? (
-          <>
-            <CloudinaryImage
-              publicId={publicId}
-              version={version}
-              alt={name}
-              fill
-              quality="best"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 40vw, 90vw"
-            />
-            {hoverPublicId && hoverVersion ? (
-              <CloudinaryImage
-                publicId={hoverPublicId}
-                version={hoverVersion}
-                alt={`${name} — vista alternativa`}
-                fill
-                quality="best"
-                className="object-cover opacity-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 40vw, 90vw"
-              />
-            ) : null}
-          </>
+          <CloudinaryHoverPair
+            primary={{ publicId, version }}
+            hover={
+              hoverPublicId && hoverVersion
+                ? { publicId: hoverPublicId, version: hoverVersion }
+                : null
+            }
+            alt={name}
+            quality="best"
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 40vw, 90vw"
+            imageClassName="object-cover transition-transform duration-500 group-hover:scale-105"
+            hoverClassName="object-cover opacity-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
+          />
         ) : (
           <div className="flex h-full items-center justify-center bg-[var(--header-soft)] text-sm text-stone-500">
             {name}

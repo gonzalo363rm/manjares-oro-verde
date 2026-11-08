@@ -5,6 +5,7 @@ import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 import { AddToCartButton } from "@/components/catalog/AddToCartButton";
 import { ShareProductButton } from "@/components/catalog/ShareProductButton";
+import { CloudinaryHoverPair } from "@/components/ui/CloudinaryHoverPair";
 import { CloudinaryImage } from "@/components/ui/CloudinaryImage";
 import { Button } from "@/components/ui/button";
 import {
@@ -135,27 +136,15 @@ export function ProductCard({
           aria-label={`Ver ${name}`}
         >
           {primary ? (
-            <>
-              <CloudinaryImage
-                publicId={primary.publicId}
-                version={primary.version}
-                alt={name}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 40vw, 90vw"
-              />
-              {secondary ? (
-                <CloudinaryImage
-                  publicId={secondary.publicId}
-                  version={secondary.version}
-                  alt={`${name} — vista alternativa`}
-                  fill
-                  quality="best"
-                  className="object-cover opacity-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
-                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 40vw, 90vw"
-                />
-              ) : null}
-            </>
+            <CloudinaryHoverPair
+              primary={primary}
+              hover={secondary}
+              alt={name}
+              quality="best"
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 40vw, 90vw"
+              imageClassName="object-cover transition-transform duration-500 group-hover:scale-105"
+              hoverClassName="object-cover opacity-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-stone-400">
               Sin imagen

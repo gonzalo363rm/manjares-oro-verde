@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
-import { CloudinaryImage } from "@/components/ui/CloudinaryImage";
+import { CloudinaryHoverPair } from "@/components/ui/CloudinaryHoverPair";
 import { cn } from "@/lib/utils";
 
 type ProductPreview = {
@@ -150,28 +150,16 @@ export function HomeCategoryRailSlider({
               className="group relative aspect-[3/4] w-[42vw] max-w-[11.5rem] shrink-0 snap-start overflow-hidden rounded-2xl bg-stone-100 sm:w-44"
             >
               {primary ? (
-                <>
-                  <CloudinaryImage
-                    publicId={primary.publicId}
-                    version={primary.version}
-                    alt={product.name}
-                    fill
-                    draggable={false}
-                    className="pointer-events-none object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(min-width: 640px) 176px, 42vw"
-                  />
-                  {hover ? (
-                    <CloudinaryImage
-                      publicId={hover.publicId}
-                      version={hover.version}
-                      alt={`${product.name} — vista alternativa`}
-                      fill
-                      draggable={false}
-                      className="pointer-events-none object-cover opacity-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
-                      sizes="(min-width: 640px) 176px, 42vw"
-                    />
-                  ) : null}
-                </>
+                <CloudinaryHoverPair
+                  primary={primary}
+                  hover={hover}
+                  alt={product.name}
+                  sizes="(min-width: 640px) 176px, 42vw"
+                  draggable={false}
+                  fadeIn
+                  imageClassName="pointer-events-none object-cover transition-transform duration-500 group-hover:scale-105"
+                  hoverClassName="pointer-events-none object-cover opacity-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
+                />
               ) : (
                 <div className="flex h-full items-center justify-center bg-[var(--header-soft)] p-3 text-center text-xs text-stone-500">
                   {product.name}
