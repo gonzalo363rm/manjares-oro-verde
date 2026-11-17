@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
 
 import { prisma } from "@/lib/prisma";
@@ -5,7 +6,9 @@ import { prisma } from "@/lib/prisma";
 /** Productos preview por categoría en la home (carrusel). */
 export const HOME_CATEGORY_PREVIEW_COUNT = 8;
 
-export const getActiveCategories = cache(async () => {
+const CATALOG_REVALIDATE_SECONDS = 3600;
+
+async function fetchActiveCategories() {
   return prisma.category.findMany({
     where: {
       active: true,
@@ -23,9 +26,9 @@ export const getActiveCategories = cache(async () => {
       },
     },
   });
-});
+}
 
-export const getHomeCategoryRails = cache(async () => {
+async function fetchHomeCategoryRails() {
   return prisma.category.findMany({
     where: {
       active: true,
@@ -55,9 +58,9 @@ export const getHomeCategoryRails = cache(async () => {
       },
     },
   });
-});
+}
 
-export const getCatalogProducts = cache(async (categorySlug?: string) => {
+async function fetchCatalogProducts(categorySlug?: string) {
   return prisma.product.findMany({
     where: {
       active: true,
@@ -71,10 +74,46 @@ export const getCatalogProducts = cache(async (categorySlug?: string) => {
       images: { orderBy: { sortOrder: "asc" }, take: 6 },
     },
   });
-});
+}
 
-export const getCategoryBySlug = cache(async (slug: string) => {
+async function fetchCategoryBySlug(slug: string) {
   return prisma.category.findFirst({
     where: { slug, active: true },
   });
+}
+
+export const getActiveCategories = cache(
+  unstable_cache(fetchActiveCategories, ["active-categories"], {
+    tags: ["catalog"],
+    revalidate: CATALOG_REVALIDATE_SECONDS,
+  })
+);
+
+export const getHomeCategoryRails = cache(
+  unstable_cache(fetchHomeCategoryRails, ["home-category-rails"], {
+    tags: ["catalog"],
+    revalidate: CATALOG_REVALIDATE_SECONDS,
+  })
+);
+
+export const getCatalogProducts = cache(async (categorySlug?: string) => {
+  return unstable_cache(
+    () => fetchCatalogProducts(categorySlug),
+    ["catalog-products", categorySlug ?? "all"],
+    {
+      tags: ["catalog"],
+      revalidate: CATALOG_REVALIDATE_SECONDS,
+    }
+  )();
+});
+
+export const getCategoryBySlug = cache(async (slug: string) => {
+  return unstable_cache(
+    () => fetchCategoryBySlug(slug),
+    ["category-by-slug", slug],
+    {
+      tags: ["catalog"],
+      revalidate: CATALOG_REVALIDATE_SECONDS,
+    }
+  )();
 });

@@ -24,29 +24,52 @@ function resolveDatabaseUrl(): string {
       console.warn(
         "[prisma] DATABASE_URL pointed to localhost; using cloud URL instead"
       );
-      return withConnectTimeout(cloud);
+      return withPoolParams(cloud);
     }
   }
 
-  return withConnectTimeout(url);
+  return withPoolParams(url);
 }
 
-/** Evita cuelgues largos y da margen a cold start de Prisma Postgres. */
-function withConnectTimeout(url: string): string {
-  if (/[?&]connect_timeout=/i.test(url)) return url;
-  return url.includes("?")
-    ? `${url}&connect_timeout=10`
-    : `${url}?connect_timeout=10`;
+/**
+ * Params del pool de Prisma Client (no del pooler externo).
+ * En serverless cada instancia tiene su propio pool: un limit alto agota la DB;
+ * un pool_timeout bajo (default 10) dispara P2024 ante cold start / ráfagas.
+ * Override: poné los query params en DATABASE_URL o PRISMA_CONNECTION_LIMIT.
+ */
+function withPoolParams(url: string): string {
+  const defaults: Record<string, string> = {
+    connect_timeout: "15",
+    pool_timeout: "20",
+    connection_limit:
+      process.env.PRISMA_CONNECTION_LIMIT?.trim() ||
+      (process.env.NODE_ENV === "production" ? "3" : "5"),
+  };
+
+  let next = url;
+  for (const [key, value] of Object.entries(defaults)) {
+    const re = new RegExp(`[?&]${key}=`, "i");
+    if (re.test(next)) continue;
+    next = next.includes("?") ? `${next}&${key}=${value}` : `${next}?${key}=${value}`;
+  }
+  return next;
 }
 
 function isRetryableDbError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   const name = error instanceof Error ? error.name : "";
+  const code =
+    error && typeof error === "object" && "code" in error
+      ? String((error as { code: unknown }).code)
+      : "";
+
   return (
     name === "PrismaClientInitializationError" ||
+    code === "P2024" ||
+    code === "P1001" ||
+    code === "P1017" ||
     message.includes("Can't reach database server") ||
-    message.includes("P1001") ||
-    message.includes("P1017") ||
+    message.includes("Timed out fetching a new connection from the connection pool") ||
     message.includes("Connection reset") ||
     message.includes("ECONNRESET") ||
     message.includes("ETIMEDOUT")
@@ -71,7 +94,7 @@ function createPrismaClient(url: string) {
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
 
-  // Reintentos cortos ante caídas intermitentes del pooler / cold start.
+  // Reintentos cortos ante caídas intermitentes del pooler / cold start / P2024.
   return base.$extends({
     query: {
       async $allOperations({ args, query }) {
@@ -83,7 +106,7 @@ function createPrismaClient(url: string) {
           } catch (error) {
             lastError = error;
             if (!isRetryableDbError(error) || i === attempts - 1) throw error;
-            await new Promise((r) => setTimeout(r, 350 * (i + 1)));
+            await new Promise((r) => setTimeout(r, 400 * (i + 1)));
             try {
               await base.$connect();
             } catch {
